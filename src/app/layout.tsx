@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { ModeToggle } from "@/components/mode-toggle";
 import { AuthProvider } from "@/context/auth";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({
           >
             <ModeToggle className="absolute right-4 bottom-4" />
             {children}
+            <Toaster />
           </ThemeProvider>
         </AuthProvider>
       </body>
