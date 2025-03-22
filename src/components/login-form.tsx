@@ -5,15 +5,21 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 
+type LoginFormProps = {
+  onSubmit?: React.FormEventHandler<HTMLFormElement>
+} & Omit<React.HTMLAttributes<HTMLDivElement>, 'onSubmit'>
+
+
 export function LoginForm({
+  onSubmit,
   className,
   ...props
-}: React.ComponentProps<'div'>) {
+}: LoginFormProps) {
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+<div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={onSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>

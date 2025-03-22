@@ -1,20 +1,27 @@
-import type React from 'react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import Link from 'next/link'
+import type React from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+
+
+type SignupFormProps = {
+  onSubmit?: React.FormEventHandler<HTMLFormElement>
+} & Omit<React.HTMLAttributes<HTMLDivElement>, 'onSubmit'>
+
 
 export function SignupForm({
+  onSubmit,
   className,
   ...props
-}: React.ComponentProps<'div'>) {
+}: SignupFormProps) {
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={onSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Crie sua conta</h1>
@@ -52,7 +59,7 @@ export function SignupForm({
                 Cadastrar
               </Button>
               <div className="text-center text-sm">
-                Já tem uma conta?{' '}
+                Já tem uma conta?{" "}
                 <Link href="/login" className="underline underline-offset-4">
                   Entrar
                 </Link>
@@ -69,10 +76,10 @@ export function SignupForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
-        Ao clicar em cadastrar, você concorda com nossos{' '}
-        <a href="#">Termos de Serviço</a> e{' '}
+        Ao clicar em cadastrar, você concorda com nossos{" "}
+        <a href="#">Termos de Serviço</a> e{" "}
         <a href="#">Política de Privacidade</a>.
       </div>
     </div>
-  )
+  );
 }
