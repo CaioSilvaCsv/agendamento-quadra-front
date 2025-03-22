@@ -1,10 +1,12 @@
 "use client";
 import { LoginForm } from "@/components/login-form";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth";
 import api from "@/services/api";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -14,8 +16,14 @@ export default function LoginPage() {
       .value;
 
     try {
-      const { data } = await api.post<{ token: string }>("/auth/login", { email, password });
-      localStorage.setItem("token", data.token);
+      const { data } = await api.post<{ token: string; userId: number }>(
+        "/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+      login(data.token, data.userId);
       router.push("/dashboard");
     } catch (err) {
       console.error(err);
