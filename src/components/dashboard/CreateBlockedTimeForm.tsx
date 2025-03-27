@@ -53,11 +53,18 @@ export function CreateBlockedTimeForm() {
           reason,
         };
       } else {
-        // Bloqueio para data específica: adiciona o offset "-03:00" se necessário.
-        const dateWithOffset = date.includes("T") ? date : `${date}T00:00:00-03:00`;
+        // Bloqueio para data específica:
+        // Se não forem informados horários (bloqueio de dia inteiro), envia somente a data.
+        // Caso contrário, adiciona o offset "-03:00".
+        const finalDate =
+          !startTime && !endTime
+            ? date
+            : date.includes("T")
+            ? date
+            : `${date}T00:00:00-03:00`;
         body = {
           courtId: Number(courtId),
-          date: dateWithOffset,
+          date: finalDate,
           recurringDay: null,
           startTime: startTime || null,
           endTime: endTime || null,
