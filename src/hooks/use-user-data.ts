@@ -21,6 +21,7 @@ export function useUserData() {
         setUser(data)
       } catch (err) {
         console.error("Erro ao buscar usuário:", err)
+        setUser(null)
       } finally {
         setLoading(false)
       }

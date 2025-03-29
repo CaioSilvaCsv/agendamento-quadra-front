@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useUserData } from "@/hooks/use-user-data"
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -9,20 +10,23 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
+  const {user , loading} = useUserData()
+  const isAuthenticated = !!user
 
   useEffect(() => {
     const token = localStorage.getItem("token")
 
-    if (!token) {
+    if (!loading && !isAuthenticated && token) {
       router.push("/login")
-    } else {
-      setLoading(false)
     }
-  }, [router])
+  }, [loading, isAuthenticated, router])
 
   if (loading) {
     return <div className="p-6 text-muted-foreground">Carregando...</div>
+  }
+
+  if (!isAuthenticated){
+    return null
   }
 
   return <>{children}</>
