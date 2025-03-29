@@ -15,7 +15,8 @@ export default function PaginaDeLogin() {
 
     const form = e.target as HTMLFormElement;
     const email = (form.querySelector("#email") as HTMLInputElement).value;
-    const password = (form.querySelector("#password") as HTMLInputElement).value;
+    const password = (form.querySelector("#password") as HTMLInputElement)
+      .value;
 
     try {
       const { data } = await api.post("/auth/login", { email, password });
@@ -33,6 +34,7 @@ export default function PaginaDeLogin() {
       <div className="w-full max-w-sm md:max-w-3xl">
         <header className="mb-6 text-center">
           <h1 className="text-3xl font-bold text-foreground">QuadraFácil</h1>
+
           <p className="mt-2 text-sm text-muted-foreground">
             Agende sua quadra com facilidade!
           </p>

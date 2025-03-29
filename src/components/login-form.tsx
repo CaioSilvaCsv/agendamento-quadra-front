@@ -1,22 +1,18 @@
 "use client";
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import Link from 'next/link'
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
 
 type LoginFormProps = {
-  onSubmit?: React.FormEventHandler<HTMLFormElement>
-} & Omit<React.HTMLAttributes<HTMLDivElement>, 'onSubmit'>
+  onSubmit?: React.FormEventHandler<HTMLFormElement>;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "onSubmit">;
 
-export function LoginForm({
-  onSubmit,
-  className,
-  ...props
-}: LoginFormProps) {
+export function LoginForm({ onSubmit, className, ...props }: LoginFormProps) {
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={onSubmit}>
@@ -52,25 +48,26 @@ export function LoginForm({
                 Entrar
               </Button>
               <div className="text-center text-sm">
-                Ainda não tem uma conta?{' '}
+                Ainda não tem uma conta?{" "}
                 <Link href="/signup" className="underline underline-offset-4">
                   Cadastre-se
                 </Link>
               </div>
             </div>
           </form>
-          <div className="relative hidden bg-muted md:block">
+          <div className="relative hidden md:block mr-6">
             <img
-              src="/placeholder.svg"
+              src="/image-base.png"
               alt="Imagem ilustrativa"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              className="absolute inset-0 h-full w-full rounded-2xl object-cover"
             />
           </div>
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
-        Ao clicar em continuar, você concorda com nossos{' '}
-        <a href="#">Termos de Serviço</a> e <a href="#">Política de Privacidade</a>.
+        Ao clicar em continuar, você concorda com nossos{" "}
+        <a href="#">Termos de Serviço</a> e{" "}
+        <a href="#">Política de Privacidade</a>.
       </div>
     </div>
   );

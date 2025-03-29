@@ -1,7 +1,7 @@
 "use client";
 
 import { Toggle } from "@/components/ui/toggle";
-import { Lock, Calendar, List, CheckSquare } from "lucide-react";
+import { Lock, Calendar, List, CheckSquare, PlusSquare } from "lucide-react";
 import { motion } from "framer-motion";
 
 export interface DashboardSettings {
@@ -9,6 +9,7 @@ export interface DashboardSettings {
   showCreateBookingForm: boolean;
   showBlockedTimesManager: boolean;
   showBookingApprovalForm: boolean;
+  showCreateCourtForm: boolean; // Nova propriedade
 }
 
 const buttonVariants = {
@@ -29,7 +30,37 @@ export function DashboardSettingsIcons({
   onChange: (s: DashboardSettings) => void;
 }) {
   return (
-    <div className="flex gap-2 p-2 border rounded-md  justify-center">
+    <div className="flex gap-2 p-2 border rounded-md justify-center">
+      <motion.div
+        className="relative flex flex-col items-center"
+        initial="rest"
+        whileHover="hover"
+        whileTap={{ scale: 0.95 }}
+        animate="rest"
+        style={{ width: "3rem" }}
+      >
+        <motion.div variants={buttonVariants}>
+          <Toggle
+            pressed={settings.showCreateCourtForm}
+            onPressedChange={(pressed) =>
+              onChange({ ...settings, showCreateCourtForm: pressed })
+            }
+            variant="outline"
+            className="p-2"
+            title="Formulário de Quadra"
+          >
+            <PlusSquare size={20} />
+          </Toggle>
+        </motion.div>
+        <motion.span
+          variants={textVariants}
+          transition={{ duration: 0.3 }}
+          className="absolute bottom-0 w-full text-center text-xs text-muted-foreground"
+        >
+          Quadra
+        </motion.span>
+      </motion.div>
+
       <motion.div
         className="relative flex flex-col items-center"
         initial="rest"
