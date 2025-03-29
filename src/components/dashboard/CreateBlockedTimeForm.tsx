@@ -4,10 +4,18 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import api from "@/services/api";
 import axios from "axios";
+import { Separator } from "../ui/separator";
+import { Calendar, Clock, Repeat, Info, MapPin } from "lucide-react";
 
 interface Court {
   id: number;
@@ -43,7 +51,7 @@ export function CreateBlockedTimeForm() {
     try {
       let body;
       if (isRecurring) {
-        // Bloqueio recorrente: utiliza o dia da semana. 
+        // Bloqueio recorrente: utiliza o dia da semana.
         body = {
           courtId: Number(courtId),
           date: null,
@@ -60,8 +68,8 @@ export function CreateBlockedTimeForm() {
           !startTime && !endTime
             ? date
             : date.includes("T")
-            ? date
-            : `${date}T00:00:00-03:00`;
+              ? date
+              : `${date}T00:00:00-03:00`;
         body = {
           courtId: Number(courtId),
           date: finalDate,
@@ -94,7 +102,7 @@ export function CreateBlockedTimeForm() {
     }
   };
 
-  // Atualizado: 0 representa Segunda-feira, 1 é Terça, ... e 6 é Domingo.
+  // 0 representa Segunda-feira, 1 é Terça, ... e 6 é Domingo.
   const daysOfWeek = [
     { value: "0", label: "Segunda-feira" },
     { value: "1", label: "Terça-feira" },
@@ -106,18 +114,31 @@ export function CreateBlockedTimeForm() {
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-semibold">Criar Bloqueio</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 bg-background p-4 rounded-md border border-border"
+    >
+      <div>
+        <h2 className="text-xl font-semibold text-foreground">Criar Bloqueio</h2>
+        <Separator className="my-4 border-border" />
+      </div>
 
       <div className="grid gap-2">
-        <Label>Quadra</Label>
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-foreground" />
+          <Label className="text-foreground">Quadra</Label>
+        </div>
         <Select value={courtId} onValueChange={setCourtId}>
-          <SelectTrigger>
+          <SelectTrigger className="bg-background border-border">
             <SelectValue placeholder="Selecione a quadra" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background border-border">
             {courts.map((court) => (
-              <SelectItem key={court.id} value={String(court.id)}>
+              <SelectItem
+                key={court.id}
+                value={String(court.id)}
+                className="text-foreground"
+              >
                 {court.name}
               </SelectItem>
             ))}
@@ -131,20 +152,27 @@ export function CreateBlockedTimeForm() {
           id="isRecurring"
           checked={isRecurring}
           onChange={(e) => setIsRecurring(e.target.checked)}
+          className="w-4 h-4"
         />
-        <Label htmlFor="isRecurring">Bloqueio Recorrente</Label>
+        <Label htmlFor="isRecurring" className="text-foreground flex items-center gap-1">
+          <Repeat className="h-4 w-4 text-foreground" />
+          Bloqueio Recorrente
+        </Label>
       </div>
 
       {isRecurring ? (
         <div className="grid gap-2">
-          <Label>Dia da semana</Label>
+          <div className="flex items-center gap-2">
+            <Repeat className="h-4 w-4 text-foreground" />
+            <Label className="text-foreground">Dia da semana</Label>
+          </div>
           <Select value={recurringDay} onValueChange={setRecurringDay}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-background border-border">
               <SelectValue placeholder="Selecione o dia da semana" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background border-border">
               {daysOfWeek.map((day) => (
-                <SelectItem key={day.value} value={day.value}>
+                <SelectItem key={day.value} value={day.value} className="text-foreground">
                   {day.label}
                 </SelectItem>
               ))}
@@ -153,45 +181,69 @@ export function CreateBlockedTimeForm() {
         </div>
       ) : (
         <div className="grid gap-2">
-          <Label htmlFor="date">Data</Label>
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-foreground" />
+            <Label htmlFor="date" className="text-foreground">
+              Data
+            </Label>
+          </div>
           <Input
             id="date"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
+            className="bg-background border-border text-foreground max-w-md"
           />
         </div>
       )}
 
       <div className="grid gap-2">
-        <Label htmlFor="startTime">Horário de Início (opcional)</Label>
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-foreground" />
+          <Label htmlFor="startTime" className="text-foreground">
+            Horário de Início (opcional)
+          </Label>
+        </div>
         <Input
           id="startTime"
           type="time"
           value={startTime}
           onChange={(e) => setStartTime(e.target.value)}
+          className="bg-background border-border text-foreground max-w-md"
         />
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="endTime">Horário de Término (opcional)</Label>
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-foreground" />
+          <Label htmlFor="endTime" className="text-foreground">
+            Horário de Término (opcional)
+          </Label>
+        </div>
         <Input
           id="endTime"
           type="time"
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
+          className="bg-background border-border text-foreground max-w-md"
         />
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="reason">Motivo</Label>
+        <div className="flex items-center gap-2">
+          <Info className="h-4 w-4 text-foreground" />
+          <Label htmlFor="reason" className="text-foreground">
+            Motivo
+          </Label>
+        </div>
         <Input
           id="reason"
           type="text"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           required
+          className="bg-background border-border text-foreground max-w-md"
         />
       </div>
 
