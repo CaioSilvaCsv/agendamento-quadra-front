@@ -17,7 +17,7 @@ export function useUserData() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await api.get("/users/me")
+        const { data } = await api.get<User>("/users/me")
         setUser(data)
       } catch (err) {
         console.error("Erro ao buscar usuário:", err)
@@ -26,7 +26,6 @@ export function useUserData() {
         setLoading(false)
       }
     }
-
     fetchUser()
   }, [])
 

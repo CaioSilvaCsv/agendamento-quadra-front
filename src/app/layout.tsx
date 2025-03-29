@@ -38,7 +38,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <ModeToggle className="fixed right-4 bottom-4" />
+            <ModeToggle className="fixed z-50 right-4 bottom-4" />
             {children}
             <Toaster />
           </ThemeProvider>

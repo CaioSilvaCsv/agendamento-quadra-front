@@ -77,20 +77,20 @@ export function CreateBookingForm() {
 
   const generateTimeSlots = (): TimeSlot[] => {
     if (!selectedCourt || !dateObj) return [];
-
+  
     const [openH, openM] = selectedCourt.openTime.split(":").map(Number);
     const [closeH, closeM] = selectedCourt.closeTime.split(":").map(Number);
-
+  
     const start = setMinutes(setHours(new Date(dateObj), openH), openM);
     const end = setMinutes(setHours(new Date(dateObj), closeH), closeM);
-
+  
     const slots: TimeSlot[] = [];
     let current = new Date(start);
-
+  
     while (current < end) {
       const slotStart = new Date(current);
       const slotEnd = addHours(slotStart, 1);
-
+  
       const isBlocked = filteredBlocks.some((b) => {
         if (!b.startTime || !b.endTime) {
           return true;
@@ -102,32 +102,31 @@ export function CreateBookingForm() {
         const blockEnd = new Date(`${blockDate}T${b.endTime}`);
         return slotStart >= blockStart && slotStart < blockEnd;
       });
-
+  
       const isReserved = filteredBookings.some((b) => {
         if (b.status !== "PENDING" && b.status !== "APPROVED") return false;
         return (
           slotStart < new Date(b.endTime) && slotEnd > new Date(b.startTime)
         );
       });
-
-      const slotStatus: TimeSlot["status"] = isBlocked
-        ? "blocked"
-        : isReserved
-        ? "reserved"
-        : "available";
-
+  
+      // Prioriza a reserva: se houver uma reserva, o slot será "reserved", senão, se houver bloqueio, será "blocked".
+      const slotStatus: TimeSlot["status"] =
+        isReserved ? "reserved" : isBlocked ? "blocked" : "available";
+  
       slots.push({
         start: format(slotStart, "HH:mm"),
         end: format(slotEnd, "HH:mm"),
         status: slotStatus,
       });
-
+  
       current = slotEnd;
     }
-
+  
     console.log("⏳ Gerando slots:", slots);
     return slots;
   };
+  
 
   const slots = useMemo(generateTimeSlots, [
     selectedCourt,
