@@ -4,11 +4,19 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import api from "@/services/api";
 import axios from "axios";
 import { format, isSameDay, setHours, setMinutes, addHours } from "date-fns";
+import { Separator } from "../ui/separator";
+import { Calendar, Clock, MapPin } from "lucide-react";
 
 interface Court {
   id: number;
@@ -50,14 +58,19 @@ export function CreateBookingForm() {
   const dateObj = date ? new Date(date) : null;
 
   const filteredBookings = useMemo(() => {
-    return courtBookings.filter((b) => dateObj && isSameDay(new Date(b.date), dateObj));
+    return courtBookings.filter(
+      (b) => dateObj && isSameDay(new Date(b.date), dateObj)
+    );
   }, [courtBookings, dateObj]);
 
   const filteredBlocks = useMemo(() => {
     return blockedTimes.filter((b) => {
       const blockDate = b.date ? new Date(b.date) : null;
       const sameDay = blockDate && dateObj && isSameDay(blockDate, dateObj);
-      const sameWeekday = b.recurringDay !== undefined && dateObj && b.recurringDay === dateObj.getDay();
+      const sameWeekday =
+        b.recurringDay !== undefined &&
+        dateObj &&
+        b.recurringDay === dateObj.getDay();
       return sameDay || sameWeekday;
     });
   }, [blockedTimes, dateObj]);
@@ -78,26 +91,30 @@ export function CreateBookingForm() {
       const slotStart = new Date(current);
       const slotEnd = addHours(slotStart, 1);
 
-      // Verifica se o slot está bloqueado:
       const isBlocked = filteredBlocks.some((b) => {
-        // Se não há horários definidos, o bloqueio cobre o dia inteiro.
         if (!b.startTime || !b.endTime) {
           return true;
         }
-        // Para bloqueios com horário definido, utiliza a data do bloqueio (ou a data atual para bloqueios recorrentes)
-        const blockDate = b.date ? b.date.split("T")[0] : format(dateObj, "yyyy-MM-dd");
+        const blockDate = b.date
+          ? b.date.split("T")[0]
+          : format(dateObj, "yyyy-MM-dd");
         const blockStart = new Date(`${blockDate}T${b.startTime}`);
         const blockEnd = new Date(`${blockDate}T${b.endTime}`);
         return slotStart >= blockStart && slotStart < blockEnd;
       });
 
-      // Considera como reserva apenas os bookings com status PENDING ou APPROVED
       const isReserved = filteredBookings.some((b) => {
         if (b.status !== "PENDING" && b.status !== "APPROVED") return false;
-        return slotStart < new Date(b.endTime) && slotEnd > new Date(b.startTime);
+        return (
+          slotStart < new Date(b.endTime) && slotEnd > new Date(b.startTime)
+        );
       });
 
-      const slotStatus: TimeSlot["status"] = isBlocked ? "blocked" : isReserved ? "reserved" : "available";
+      const slotStatus: TimeSlot["status"] = isBlocked
+        ? "blocked"
+        : isReserved
+        ? "reserved"
+        : "available";
 
       slots.push({
         start: format(slotStart, "HH:mm"),
@@ -112,7 +129,12 @@ export function CreateBookingForm() {
     return slots;
   };
 
-  const slots = useMemo(generateTimeSlots, [selectedCourt, dateObj, filteredBookings, filteredBlocks]);
+  const slots = useMemo(generateTimeSlots, [
+    selectedCourt,
+    dateObj,
+    filteredBookings,
+    filteredBlocks,
+  ]);
 
   useEffect(() => {
     const fetchCourts = async () => {
@@ -184,18 +206,24 @@ export function CreateBookingForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-semibold">Nova Reserva</h2>
+    <form onSubmit={handleSubmit} className="space-y-4 bg-background p-4 rounded-md border border-border">
+      <div>
+        <h2 className="text-xl font-semibold text-foreground">Nova Reserva</h2>
+        <Separator className="my-4 border-border" />
+      </div>
 
       <div className="grid gap-2">
-        <Label>Quadra</Label>
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-foreground" />
+          <Label>Quadra</Label>
+        </div>
         <Select value={courtId} onValueChange={setCourtId}>
-          <SelectTrigger>
+          <SelectTrigger className="bg-background border-border">
             <SelectValue placeholder="Selecione a quadra" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background border-border">
             {courts.map((court) => (
-              <SelectItem key={court.id} value={String(court.id)}>
+              <SelectItem key={court.id} value={String(court.id)} className="text-foreground">
                 {court.name}
               </SelectItem>
             ))}
@@ -204,56 +232,75 @@ export function CreateBookingForm() {
       </div>
 
       {selectedCourt && (
-        <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-          <p>
-            <strong>Local:</strong> {selectedCourt.location}
+        <div className="bg-muted p-3 rounded-md text-sm text-muted-foreground">
+          <p className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            <span className="font-semibold">Local:</span> {selectedCourt.location}
           </p>
-          <p>
-            <strong>Horário:</strong> {selectedCourt.openTime} - {selectedCourt.closeTime}
+          <p className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            <span className="font-semibold">Horário:</span> {selectedCourt.openTime} - {selectedCourt.closeTime}
           </p>
           {selectedCourt.description && (
-            <p>
-              <strong>Descrição:</strong> {selectedCourt.description}
+            <p className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <span className="font-semibold">Descrição:</span> {selectedCourt.description}
             </p>
           )}
         </div>
       )}
 
       <div className="grid gap-2">
-        <Label htmlFor="date">Data</Label>
-        <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-foreground" />
+          <Label htmlFor="date">Data</Label>
+        </div>
+        <Input
+          id="date"
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          required
+          className="bg-background border-border text-foreground"
+        />
       </div>
 
       {date && (
         <div className="bg-muted p-3 rounded-md text-sm space-y-4">
-          <div>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-foreground" />
             <p className="font-semibold">Horários do dia:</p>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {slots.map((slot, i) => (
-                <Button
-                  key={i}
-                  variant="outline"
-                  className="cursor-pointer"
-                  disabled={slot.status !== "available"}
-                  onClick={() => {
-                    setStartTime(slot.start);
-                    setEndTime(slot.end);
-                  }}
-                >
-                  {slot.start} - {slot.end}
-                </Button>
-              ))}
-            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            {slots.map((slot, i) => (
+              <Button
+                key={i}
+                variant="outline"
+                className="cursor-pointer"
+                disabled={slot.status !== "available"}
+                onClick={() => {
+                  setStartTime(slot.start);
+                  setEndTime(slot.end);
+                }}
+              >
+                {slot.start} - {slot.end}
+              </Button>
+            ))}
           </div>
 
           <div className="bg-white rounded-md border p-3">
-            <p className="font-semibold mb-2">Horários indisponíveis:</p>
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="h-4 w-4 text-foreground" />
+              <p className="font-semibold">Horários indisponíveis:</p>
+            </div>
             <ul className="list-disc list-inside text-sm">
-              {slots.filter((s) => s.status !== "available").map((s, i) => (
-                <li key={i}>
-                  {s.start} - {s.end} ({s.status === "reserved" ? "Reservado" : "Bloqueado"})
-                </li>
-              ))}
+              {slots
+                .filter((s) => s.status !== "available")
+                .map((s, i) => (
+                  <li key={i}>
+                    {s.start} - {s.end} ({s.status === "reserved" ? "Reservado" : "Bloqueado"})
+                  </li>
+                ))}
             </ul>
           </div>
         </div>
@@ -261,12 +308,32 @@ export function CreateBookingForm() {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="grid gap-2">
-          <Label htmlFor="startTime">Início</Label>
-          <Input id="startTime" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-foreground" />
+            <Label htmlFor="startTime">Início</Label>
+          </div>
+          <Input
+            id="startTime"
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            required
+            className="bg-background border-border text-foreground"
+          />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="endTime">Término</Label>
-          <Input id="endTime" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-foreground" />
+            <Label htmlFor="endTime">Término</Label>
+          </div>
+          <Input
+            id="endTime"
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            required
+            className="bg-background border-border text-foreground"
+          />
         </div>
       </div>
 
