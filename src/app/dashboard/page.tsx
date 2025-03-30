@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, JSX } from "react";
 import { useUserData } from "@/hooks/use-user-data";
-import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth-guard";
 import { CreateBookingForm } from "@/components/dashboard/create-bookings-form";
 import { CreateBlockedTimeForm } from "@/components/dashboard/CreateBlockedTimeForm";
@@ -24,7 +23,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function DashboardPage() {
   const { user, loading } = useUserData();
-  const router = useRouter();
 
   const initialDesktopSettings: DashboardSettings = {
     showCreateBlockedTimeForm: true,
