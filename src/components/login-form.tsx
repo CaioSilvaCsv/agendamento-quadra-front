@@ -1,16 +1,30 @@
 "use client";
+
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
 type LoginFormProps = {
   onSubmit?: React.FormEventHandler<HTMLFormElement>;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "onSubmit">;
 
 export function LoginForm({ onSubmit, className, ...props }: LoginFormProps) {
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
@@ -35,12 +49,13 @@ export function LoginForm({ onSubmit, className, ...props }: LoginFormProps) {
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Senha</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPasswordOpen(true)}
+                    className="ml-auto text-sm underline underline-offset-2 hover:underline"
                   >
                     Esqueceu sua senha?
-                  </a>
+                  </button>
                 </div>
                 <Input id="password" type="password" required />
               </div>
@@ -69,6 +84,24 @@ export function LoginForm({ onSubmit, className, ...props }: LoginFormProps) {
         <a href="#">Termos de Serviço</a> e{" "}
         <a href="#">Política de Privacidade</a>.
       </div>
+
+      {/* Modal para recuperação de senha */}
+      <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Recuperar senha</DialogTitle>
+            <DialogDescription>
+              Insira seu e-mail para receber um link de redefinição de senha.
+            </DialogDescription>
+          </DialogHeader>
+          <ForgotPasswordForm onSuccess={() => setIsForgotPasswordOpen(false)} />
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Fechar</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
