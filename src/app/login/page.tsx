@@ -10,14 +10,7 @@ export default function PaginaDeLogin() {
   const { login } = useAuth();
   const { showError, showSuccess } = useToastHandler();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const form = e.target as HTMLFormElement;
-    const email = (form.querySelector("#email") as HTMLInputElement).value;
-    const password = (form.querySelector("#password") as HTMLInputElement)
-      .value;
-
+  const handleLogin = async (email: string, password: string) => {
     try {
       const { data } = await api.post("/auth/login", { email, password });
       login(data.token, data.userId);

@@ -17,6 +17,7 @@ import axios from "axios";
 import { format, isSameDay, setHours, setMinutes, addHours } from "date-fns";
 import { Separator } from "../ui/separator";
 import { Calendar, Clock, MapPin } from "lucide-react";
+import { useBookingUpdate } from "@/context/BookingUpdateContext";
 
 interface Court {
   id: number;
@@ -45,6 +46,7 @@ interface TimeSlot {
 }
 
 export function CreateBookingForm() {
+  const { triggerUpdate } = useBookingUpdate();
   const [courts, setCourts] = useState<Court[]>([]);
   const [courtId, setCourtId] = useState("");
   const [date, setDate] = useState("");
@@ -77,20 +79,20 @@ export function CreateBookingForm() {
 
   const generateTimeSlots = (): TimeSlot[] => {
     if (!selectedCourt || !dateObj) return [];
-  
+
     const [openH, openM] = selectedCourt.openTime.split(":").map(Number);
     const [closeH, closeM] = selectedCourt.closeTime.split(":").map(Number);
-  
+
     const start = setMinutes(setHours(new Date(dateObj), openH), openM);
     const end = setMinutes(setHours(new Date(dateObj), closeH), closeM);
-  
+
     const slots: TimeSlot[] = [];
     let current = new Date(start);
-  
+
     while (current < end) {
       const slotStart = new Date(current);
       const slotEnd = addHours(slotStart, 1);
-  
+
       const isBlocked = filteredBlocks.some((b) => {
         if (!b.startTime || !b.endTime) {
           return true;
@@ -102,31 +104,33 @@ export function CreateBookingForm() {
         const blockEnd = new Date(`${blockDate}T${b.endTime}`);
         return slotStart >= blockStart && slotStart < blockEnd;
       });
-  
+
       const isReserved = filteredBookings.some((b) => {
         if (b.status !== "PENDING" && b.status !== "APPROVED") return false;
         return (
           slotStart < new Date(b.endTime) && slotEnd > new Date(b.startTime)
         );
       });
-  
+
       // Prioriza a reserva: se houver uma reserva, o slot será "reserved", senão, se houver bloqueio, será "blocked".
-      const slotStatus: TimeSlot["status"] =
-        isReserved ? "reserved" : isBlocked ? "blocked" : "available";
-  
+      const slotStatus: TimeSlot["status"] = isReserved
+        ? "reserved"
+        : isBlocked
+          ? "blocked"
+          : "available";
+
       slots.push({
         start: format(slotStart, "HH:mm"),
         end: format(slotEnd, "HH:mm"),
         status: slotStatus,
       });
-  
+
       current = slotEnd;
     }
-  
+
     console.log("⏳ Gerando slots:", slots);
     return slots;
   };
-  
 
   const slots = useMemo(generateTimeSlots, [
     selectedCourt,
@@ -181,6 +185,7 @@ export function CreateBookingForm() {
         endTime,
       });
       toast.success("Reserva criada com sucesso!", { duration: 4000 });
+      triggerUpdate();
       setCourtId("");
       setDate("");
       setStartTime("");
@@ -205,7 +210,10 @@ export function CreateBookingForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-background p-4 rounded-md border border-border">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 bg-background p-4 rounded-md border border-border"
+    >
       <div>
         <h2 className="text-xl font-semibold text-foreground">Nova Reserva</h2>
         <Separator className="my-4 border-border" />
@@ -222,7 +230,11 @@ export function CreateBookingForm() {
           </SelectTrigger>
           <SelectContent className="bg-background border-border">
             {courts.map((court) => (
-              <SelectItem key={court.id} value={String(court.id)} className="text-foreground">
+              <SelectItem
+                key={court.id}
+                value={String(court.id)}
+                className="text-foreground"
+              >
                 {court.name}
               </SelectItem>
             ))}
@@ -234,16 +246,19 @@ export function CreateBookingForm() {
         <div className="bg-muted p-3 rounded-md text-sm text-muted-foreground">
           <p className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
-            <span className="font-semibold">Local:</span> {selectedCourt.location}
+            <span className="font-semibold">Local:</span>{" "}
+            {selectedCourt.location}
           </p>
           <p className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
-            <span className="font-semibold">Horário:</span> {selectedCourt.openTime} - {selectedCourt.closeTime}
+            <span className="font-semibold">Horário:</span>{" "}
+            {selectedCourt.openTime} - {selectedCourt.closeTime}
           </p>
           {selectedCourt.description && (
             <p className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              <span className="font-semibold">Descrição:</span> {selectedCourt.description}
+              <span className="font-semibold">Descrição:</span>{" "}
+              {selectedCourt.description}
             </p>
           )}
         </div>
@@ -297,7 +312,8 @@ export function CreateBookingForm() {
                 .filter((s) => s.status !== "available")
                 .map((s, i) => (
                   <li key={i}>
-                    {s.start} - {s.end} ({s.status === "reserved" ? "Reservado" : "Bloqueado"})
+                    {s.start} - {s.end} (
+                    {s.status === "reserved" ? "Reservado" : "Bloqueado"})
                   </li>
                 ))}
             </ul>

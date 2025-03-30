@@ -5,6 +5,7 @@ import "./globals.css";
 import { ModeToggle } from "@/components/mode-toggle";
 import { AuthProvider } from "@/context/auth";
 import { Toaster } from "@/components/ui/sonner";
+import { BookingUpdateProvider } from "@/context/BookingUpdateContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
+        <BookingUpdateProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -46,6 +48,7 @@ export default function RootLayout({
             {children}
             <Toaster />
           </ThemeProvider>
+          </BookingUpdateProvider>
         </AuthProvider>
       </body>
     </html>

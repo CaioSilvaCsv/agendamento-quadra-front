@@ -9,15 +9,9 @@ export default function SignupPage() {
   const router = useRouter()
   const { showError, showSuccess } = useToastHandler()
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const form = e.target as HTMLFormElement
-    const name = (form.querySelector("#name") as HTMLInputElement).value
-    const email = (form.querySelector("#email") as HTMLInputElement).value
-    const password = (form.querySelector("#password") as HTMLInputElement).value
-
+  const handleSignup = async (data: { name: string; email: string; password: string }) => {
     try {
-      await api.post("/users", { name, email, password })
+      await api.post("/users", data)
       showSuccess("Cadastro realizado com sucesso!")
       router.push("/login")
     } catch (err) {

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { getMyBookings, cancelBooking } from "@/services/bookings"
 import { toast } from "sonner"
 import { formatDateUTC, formatHourUTC } from "@/utils/date"
+import { useBookingUpdate } from "@/context/BookingUpdateContext"
 
 interface Booking {
   id: number
@@ -22,6 +23,8 @@ interface Booking {
 export function UserBookings() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
+  const { updated } = useBookingUpdate() // <- escuta atualizações
+
 
   const fetchBookings = async () => {
     try {
@@ -34,6 +37,9 @@ export function UserBookings() {
       setLoading(false)
     }
   }
+  useEffect(() => {
+    fetchBookings()
+  }, [updated])
 
   const handleCancel = async (id: number) => {
     try {
