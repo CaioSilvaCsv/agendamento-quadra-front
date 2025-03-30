@@ -1,0 +1,17 @@
+[build]
+builder = "NIXPACKS"
+
+[phases.setup]
+nixPkgs = ["nodejs_18", "npm"]
+
+[phases.install]
+cmds = [
+  "echo '🔧 Instalando dependências com legacy-peer-deps (nixpacks.toml ativado)'",
+  "npm install --legacy-peer-deps"
+]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm run start"
