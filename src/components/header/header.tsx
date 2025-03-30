@@ -21,38 +21,12 @@ export function Header() {
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/dashboard" className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-foreground">
-              QuadraFácil
-            </h1>
+            <h1 className="text-2xl font-bold text-foreground">QuadraFácil</h1>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex md:items-center md:space-x-6">
-          <Link
-            href="/"
-            className="text-sm font-medium transition-colors hover:text-primary"
-          >
-            Início
-          </Link>
-          <Link
-            href="/sobre"
-            className="text-sm font-medium transition-colors hover:text-primary"
-          >
-            Sobre
-          </Link>
-          <Link
-            href="/servicos"
-            className="text-sm font-medium transition-colors hover:text-primary"
-          >
-            Serviços
-          </Link>
-          <Link
-            href="/contato"
-            className="text-sm font-medium transition-colors hover:text-primary"
-          >
-            Contato
-          </Link>
           <Button onClick={logout}>Sair</Button>
         </nav>
 
@@ -70,35 +44,7 @@ export function Header() {
       {/* Mobile Navigation */}
       <div className={cn("container md:hidden", isOpen ? "block" : "hidden")}>
         <div className="flex flex-col space-y-4 py-4">
-          <Link
-            href="/"
-            className="text-sm font-medium transition-colors hover:text-primary"
-            onClick={() => setIsOpen(false)}
-          >
-            Início
-          </Link>
-          <Link
-            href="/sobre"
-            className="text-sm font-medium transition-colors hover:text-primary"
-            onClick={() => setIsOpen(false)}
-          >
-            Sobre
-          </Link>
-          <Link
-            href="/servicos"
-            className="text-sm font-medium transition-colors hover:text-primary"
-            onClick={() => setIsOpen(false)}
-          >
-            Serviços
-          </Link>
-          <Link
-            href="/contato"
-            className="text-sm font-medium transition-colors hover:text-primary"
-            onClick={() => setIsOpen(false)}
-          >
-            Contato
-          </Link>
-          <Button className="w-full">Entrar</Button>
+          <Button onClick={logout}>Sair</Button>
         </div>
       </div>
     </header>
