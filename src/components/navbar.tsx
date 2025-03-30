@@ -12,8 +12,9 @@ import { useAuth } from "@/context/auth";
 
 export default function Navbar() {
   const items: NavItemInterface[] = [
-    { url: "/", label: "Inicio" },
+    { url: "/quadras", label: "Inicio" },
     { url: "/dashboard", label: "Painel" },
+    { url: "/login", label: "Login" },
   ];
 
   const { logout } = useAuth();
@@ -40,9 +41,11 @@ export default function Navbar() {
             alt="Logo do andamento de quadras"
             className="w-12 h-12 object-cover"
           />
-          <h1>
-            Agendamento <br /> Quadra
-          </h1>
+          <div className="flex items-center">
+          <Link href="/dashboard" className="flex items-center space-x-2">
+            <h1 className="text-2xl font-bold text-foreground">QuadraFácil</h1>
+          </Link>
+        </div>
         </Link>
 
         {/* Desktop Navigation*/}

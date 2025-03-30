@@ -1,4 +1,4 @@
-import { Header } from "@/components/header/header";
+import Navbar from "@/components/navbar";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,8 +12,7 @@ export default function RootLayout({
 }>) {
   return (
     <div className="flex min-h-screen flex-col">
-      <Header /> 
-
+      <Navbar/> 
       <div className="flex-1">{children}</div>
     </div>
   );
