@@ -49,10 +49,9 @@ interface TimeSlot {
 
 /**
  * @returns Componente CreateBookingForm
- * @description Formulário para criar uma nova reserva de quadra e verificando 
- * suas pendencias e bloqueios para limitar.
+ * @description Formulário para criar uma nova reserva de quadra e verificar
+ * pendências e bloqueios para limitar as reservas.
  */
-
 export function CreateBookingForm() {
   const { triggerUpdate } = useBookingUpdate();
   const [courts, setCourts] = useState<Court[]>([]);
@@ -65,12 +64,14 @@ export function CreateBookingForm() {
   const [blockedTimes, setBlockedTimes] = useState<BookingBlock[]>([]);
 
   const selectedCourt = courts.find((court) => String(court.id) === courtId);
-  // Forçamos a criação do objeto de data a partir do input adicionando "T00:00:00"
+  // Força a criação do objeto de data a partir do input adicionando "T00:00:00"
   const dateObj = date ? new Date(date + "T00:00:00") : null;
 
   // Filtra as reservas comparando apenas a parte da data (yyyy-MM-dd)
   const filteredBookings = useMemo(() => {
-    return courtBookings.filter((b) => date && b.date?.substring(0, 10) === date);
+    return courtBookings.filter(
+      (b) => date && b.date?.substring(0, 10) === date
+    );
   }, [courtBookings, date]);
 
   // Filtra os bloqueios, considerando reservas específicas ou recorrentes
@@ -78,10 +79,11 @@ export function CreateBookingForm() {
     return blockedTimes.filter((b) => {
       const blockDate = b.date ? b.date.substring(0, 10) : null;
       const sameDay = blockDate === date;
+      // Converte o dia da semana para iniciar em segunda (segunda = 0, terça = 1, etc.)
       const sameWeekday =
         b.recurringDay !== undefined &&
         date &&
-        new Date(date + "T00:00:00").getDay() === b.recurringDay;
+        ((new Date(date + "T00:00:00").getDay() + 6) % 7) === b.recurringDay;
       return sameDay || sameWeekday;
     });
   }, [blockedTimes, date]);
@@ -105,11 +107,9 @@ export function CreateBookingForm() {
       const slotStart = new Date(current);
       const slotEnd = addHours(slotStart, 1);
 
-      // Verifica se há bloqueio: compara o slot com o horário bloqueado (usando split para obter a data)
+      // Verifica se há bloqueio: compara o slot com o horário bloqueado
       const isBlocked = filteredBlocks.some((b) => {
-        if (!b.startTime || !b.endTime) {
-          return true;
-        }
+        if (!b.startTime || !b.endTime) return true;
         const blockDate = b.date ? b.date.split("T")[0] : date;
         const blockStart = new Date(`${blockDate}T${b.startTime}`);
         const blockEnd = new Date(`${blockDate}T${b.endTime}`);
