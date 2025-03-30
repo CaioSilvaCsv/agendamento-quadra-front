@@ -297,12 +297,12 @@ export function CreateBookingForm() {
       </div>
 
       {date && (
-        <div className="bg-muted p-3 rounded-md text-sm space-y-4">
+        <div className="bg-primary/15 p-3 rounded-md text-sm  space-y-4">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-foreground" />
             <p className="font-semibold">Horários do dia:</p>
           </div>
-          <div className="grid grid-cols-2 gap-2 mt-2">
+          <div className="grid grid-cols-2 gap-2 mt-2 ">
             {slots.map((slot, i) => (
               <Button
                 key={i}
@@ -319,13 +319,13 @@ export function CreateBookingForm() {
             ))}
           </div>
 
-          <div className="bg-white rounded-md border p-3">
+          <div className="bg-background rounded-md border p-3">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="h-4 w-4 text-foreground" />
               <p className="font-semibold">Horários indisponíveis:</p>
             </div>
             {date && filteredBookings.length > 0 && (
-              <div className="bg-white rounded-md border p-3 mt-4">
+              <div className="bg-background rounded-md border p-3 mt-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Calendar className="h-4 w-4 text-foreground" />
                   <p className="font-semibold">Reservas no dia:</p>
