@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, JSX } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useUserData } from "@/hooks/use-user-data";
 import { AuthGuard } from "@/components/auth-guard";
 import { CreateBookingForm } from "@/components/dashboard/create-bookings-form";
@@ -20,21 +20,31 @@ import {
   DashboardSettings,
 } from "@/components/dashboard/DashboardSettingsIcons";
 import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
 
 export default function DashboardPage() {
   const { user, loading } = useUserData();
 
-  const initialDesktopSettings: DashboardSettings = {
+  const [isMobile, setIsMobile] = useState(false);
+  const [activePanelIndex, setActivePanelIndex] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const initialSettings: DashboardSettings = {
     showCreateBlockedTimeForm: true,
     showCreateBookingForm: true,
     showBlockedTimesManager: true,
-    showBookingApprovalForm: false,
+    showBookingApprovalForm: true,
     showCreateCourtForm: true,
   };
 
-  const [dashboardSettings, setDashboardSettings] = useState<DashboardSettings>(
-    initialDesktopSettings
-  );
+  const [dashboardSettings, setDashboardSettings] =
+    useState<DashboardSettings>(initialSettings);
 
   useEffect(() => {
     const saved = localStorage.getItem("dashboardSettings");
@@ -42,7 +52,7 @@ export default function DashboardPage() {
       try {
         setDashboardSettings(JSON.parse(saved));
       } catch (error) {
-        console.error("Erro ao parsear as configurações:", error);
+        console.error("Erro ao parsear configurações:", error);
       }
     }
   }, []);
@@ -54,143 +64,91 @@ export default function DashboardPage() {
     );
   }, [dashboardSettings]);
 
-  // Cria um array com o conteúdo de cada painel (sem os wrappers de ResizablePanel)
   const adminPanelContents = useMemo(() => {
-    const contents: JSX.Element[] = [];
+    const panels: JSX.Element[] = [];
+
     if (dashboardSettings.showCreateCourtForm) {
-      contents.push(
-        <div key="createCourt" className="p-4">
-          <CreateCourtForm />
-        </div>
-      );
+      panels.push(<CreateCourtForm key="createCourt" />);
     }
     if (dashboardSettings.showCreateBlockedTimeForm) {
-      contents.push(
-        <div key="createBlockedTime" className="p-4">
-          <CreateBlockedTimeForm />
-        </div>
-      );
+      panels.push(<CreateBlockedTimeForm key="blockedTime" />);
     }
     if (dashboardSettings.showCreateBookingForm) {
-      contents.push(
-        <div key="createBooking" className="p-4">
-          <CreateBookingForm />
-        </div>
-      );
+      panels.push(<CreateBookingForm key="booking" />);
     }
     if (dashboardSettings.showBlockedTimesManager) {
-      contents.push(
-        <div key="blockedManager" className="p-4">
-          <BlockedTimesManager />
-        </div>
-      );
+      panels.push(<BlockedTimesManager key="blockedManager" />);
     }
     if (dashboardSettings.showBookingApprovalForm) {
-      contents.push(
-        <div key="bookingApproval" className="p-4">
-          <BookingApprovalForm />
-        </div>
-      );
+      panels.push(<BookingApprovalForm key="approval" />);
     }
-    return contents;
+
+    return panels;
   }, [dashboardSettings]);
 
-  // Para desktop, envolve os conteúdos em ResizablePanelGroup com ResizablePanel
-  const desktopAdminContent = (
-    <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
-      {adminPanelContents.map((content, index) => (
-        <ResizablePanel key={index}>{content}</ResizablePanel>
-      ))}
-    </ResizablePanelGroup>
-  );
-
-  // Detecta se está em dispositivo mobile
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Para mobile, renderiza somente um painel por vez com botões de navegação
-  const [activePanelIndex, setActivePanelIndex] = useState(0);
   const mobileAdminContent = (
     <div className="space-y-4">
       <div className="flex justify-between">
         <button
-          className="px-4 py-2 border rounded disabled:opacity-50"
-          onClick={() => setActivePanelIndex((prev) => Math.max(prev - 1, 0))}
+          onClick={() => setActivePanelIndex((i) => Math.max(i - 1, 0))}
           disabled={activePanelIndex === 0}
+          className="px-4 py-2 border rounded disabled:opacity-50"
         >
           Anterior
         </button>
         <button
-          className="px-4 py-2 border rounded disabled:opacity-50"
           onClick={() =>
-            setActivePanelIndex((prev) =>
-              Math.min(prev + 1, adminPanelContents.length - 1)
+            setActivePanelIndex((i) =>
+              Math.min(i + 1, adminPanelContents.length - 1)
             )
           }
           disabled={activePanelIndex === adminPanelContents.length - 1}
+          className="px-4 py-2 border rounded disabled:opacity-50"
         >
           Próximo
         </button>
       </div>
-      <div className="rounded-lg border">
-        <ScrollArea className="h-[74vh]">
+      <div className="rounded-lg border h-[74vh]">
+        <ScrollArea className="h-full p-4">
           {adminPanelContents[activePanelIndex]}
         </ScrollArea>
       </div>
     </div>
   );
 
-  // Conteúdo para usuários comuns permanece o mesmo
-  const userContent = (
-    <div className="relative">
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="rounded-2xl border"
-      >
-        <ResizablePanel defaultSize={50}>
-          <ScrollArea className="p-4">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="rounded-xl p-4"
-            >
-              <CreateBookingForm />
-            </motion.div>
-          </ScrollArea>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={50}>
-          <ScrollArea className="h-[74vh] p-4">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="rounded-xl p-4"
-            >
-              <UserBookings />
-            </motion.div>
-          </ScrollArea>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
+  const desktopAdminContent = (
+    <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
+      {adminPanelContents.map((content, index) => (
+        <React.Fragment key={index}>
+          {index > 0 && <ResizableHandle withHandle />}
+          <ResizablePanel>
+            <ScrollArea className="h-[74vh] p-4">{content}</ScrollArea>
+          </ResizablePanel>
+        </React.Fragment>
+      ))}
+    </ResizablePanelGroup>
   );
 
-  if (loading) {
-    return (
-      <p className="p-4 text-muted-foreground">Carregando informações...</p>
-    );
-  }
-  if (!user) {
-    return (
-      <p className="p-4 text-red-500">Não foi possível carregar seus dados.</p>
-    );
-  }
+  const userContent = (
+    <ResizablePanelGroup direction="horizontal" className="rounded-2xl border">
+      <ResizablePanel defaultSize={50}>
+        <ScrollArea className="p-4">
+          <CreateBookingForm />
+        </ScrollArea>
+      </ResizablePanel>
+      <ResizableHandle withHandle />
+      <ResizablePanel defaultSize={50}>
+        <ScrollArea className="h-[74vh] p-4">
+          <UserBookings />
+        </ScrollArea>
+      </ResizablePanel>
+    </ResizablePanelGroup>
+  );
+
+  if (loading)
+    return <p className="p-4 text-muted-foreground">Carregando...</p>;
+  if (!user)
+    return <p className="p-4 text-red-500">Erro ao carregar usuário.</p>;
 
   return (
     <AuthGuard>
@@ -203,19 +161,14 @@ export default function DashboardPage() {
         >
           Bem-vindo(a), {user.name}!
         </motion.h1>
+
         {user.role === "ADMIN" && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="flex items-center justify-center"
-          >
-            <DashboardSettingsIcons
-              settings={dashboardSettings}
-              onChange={setDashboardSettings}
-            />
-          </motion.div>
+          <DashboardSettingsIcons
+            settings={dashboardSettings}
+            onChange={setDashboardSettings}
+          />
         )}
+
         <AnimatePresence mode="wait">
           {user.role === "ADMIN" ? (
             <motion.div
