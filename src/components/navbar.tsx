@@ -33,7 +33,7 @@ export default function Navbar() {
         className="px-4 py-2 flex items-center justify-between max-w-
             screen-xl mx-auto border-b border-solid"
       >
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/quadras" className="flex items-center gap-2">
           <Image
             src="icon.svg"
             width={50}
@@ -42,9 +42,7 @@ export default function Navbar() {
             className="w-12 h-12 object-cover"
           />
           <div className="flex items-center">
-          <Link href="/dashboard" className="flex items-center space-x-2">
             <h1 className="text-2xl font-bold text-foreground">QuadraFácil</h1>
-          </Link>
         </div>
         </Link>
 
