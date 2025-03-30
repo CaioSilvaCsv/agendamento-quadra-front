@@ -69,7 +69,7 @@ export function SignupForm({
           </form>
           <div className="relative hidden md:block mr-6">
             <img
-              src="/image-base.png"
+              src="/image-base.svg"
               alt="Imagem ilustrativa"
               className="absolute inset-0 h-full w-full rounded-2xl object-cover"
             />
