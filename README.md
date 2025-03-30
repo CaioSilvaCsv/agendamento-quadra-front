@@ -1,36 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# ⚽ Sistema de Agendamento de Quadras - IFNMG
 
-First, run the development server:
+## 📚 Documentação do Projeto Frontend
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 Objetivo
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Desenvolver uma aplicação funcional aplicando **boas práticas de desenvolvimento**, **organização de código** e **usabilidade**.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📝 Descrição
 
-To learn more about Next.js, take a look at the following resources:
+Esta é uma aplicação web desenvolvida com **Next.js** que permite aos usuários se cadastrarem, fazerem login e agendarem quadras esportivas. A aplicação integra uma API hospedada na Railway para realizar todas as operações necessárias. 🚀
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 💻 API
 
-## Deploy on Vercel
+Esta aplicação utiliza a nossa API para gerenciar os agendamentos, quadras e operações administrativas. Confira os detalhes:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Repositório da API:**  
+  [https://github.com/GahCunha/agendamento-quadra-backend](https://github.com/GahCunha/agendamento-quadra-backend)
+  
+- **Documentação da API:**  
+  [https://agendamento-quadra.up.railway.app/api/docs](https://agendamento-quadra.up.railway.app/api/docs)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Typescript** 🖥️
+- **React** ⚛️
+- **Next.js** 🚀
+- **NPM** 📦
+- **Tailwind CSS** 🎨
+- **Axios** 🔗
+- **Radix-ui** 📐
+- **ShadCN/UI** 🧩
+- **OKLCH Colors** 🌈
+
+---
+
+## 🌐 Acessando a Aplicação
+
+Clique no link para acessar a aplicação:  
+[🔗 https://quadrafacil.up.railway.app/](https://quadrafacil.up.railway.app/)
+
+### 👤 Funcionalidades para Usuários
+
+- ✨ **Cadastrar**
+- 🔑 **Fazer login**
+- 🗓️ **Agendar quadra**
+- 👀 **Visualizar agendamentos**
+- 🏟️ **Visualizar quadras disponíveis**
+- ⏰ **Visualizar bloqueios de horários do dia**
+
+### 👨‍💼 Funcionalidades para Administradores
+
+Além das funcionalidades para usuários, o administrador pode:
+
+- 🏗️ **Cadastrar quadra**
+- 🕒 **Cadastrar bloqueio de horário**
+- ✅ **Aprovar agendamentos**
+- ❌ **Cancelar agendamentos**
+
+---
+
+## 🚀 Como Executar o Projeto
+
+1. **Clone o repositório:**
+
+   ```bash
+   git clone https://github.com/CaioSilvaCsv/agendamento-quadra-front
+   ```
+
+2. **Acesse o diretório do projeto:**
+
+   ```bash
+   cd agendamento-quadra-front
+   ```
+
+3. **Instale as dependências:**
+
+   ```bash
+   npm install
+   ```
+
+4. **Configure as variáveis de ambiente:**
+
+   Crie um arquivo chamado `.env.local` na raiz do projeto e adicione a seguinte variável:
+
+   ```bash
+   NEXT_PUBLIC_API_URL='https://agendamento-quadra.up.railway.app/api/'
+   ```
+
+5. **Inicie o servidor de desenvolvimento:**
+
+   ```bash
+   npm run dev
+   ```
+
+6. **Acesse a aplicação via navegador:**
+
+   ```bash
+   http://localhost:3000
+   ```
+
+---
+
+## 📄 Licença
+
+Este código foi criado para aprendizado e atividades da disciplina de Desenvolvimento Web, estando disponível para fins **educativos**.
+
+- (c)[Caio da Silva](https://github.com/CaioSilvaCsv) : 2025.
+- (c)[Gabriel Cunha](https://github.com/GahCunha) : 2025.
+- (c)[Wender Alves](https://github.com/was8) : 2025.
+
+---
