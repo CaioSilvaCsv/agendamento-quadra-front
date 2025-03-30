@@ -7,10 +7,18 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import api from "@/services/api";
 import { useRouter } from "next/navigation";
+import { z } from "zod";
 
 interface ResetPasswordFormProps {
   token: string;
 }
+
+// 🎯 Esquema de validação
+const schema = z.object({
+  newPassword: z
+    .string()
+    .min(6, "A senha deve ter no mínimo 6 caracteres"),
+});
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [newPassword, setNewPassword] = useState("");
@@ -19,11 +27,22 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = schema.safeParse({ newPassword });
+
+    if (!result.success) {
+      const firstError = result.error.errors[0];
+      toast.error(firstError.message);
+      return;
+    }
+
     setLoading(true);
     try {
-      const { data } = await api.post("/auth/reset-password", { token, newPassword });
+      const { data } = await api.post("/auth/reset-password", {
+        token,
+        newPassword,
+      });
       toast.success(data.message, { duration: 4000 });
-      // Redireciona para a página de login após sucesso
       router.push("/login");
     } catch (error: any) {
       toast.error(
@@ -49,7 +68,11 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           required
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full items-center mt-2">
+      <Button
+        type="submit"
+        disabled={loading}
+        className="w-full items-center mt-2"
+      >
         {loading ? "Processando..." : "Redefinir Senha"}
       </Button>
     </form>

@@ -17,19 +17,45 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
+import { toast } from "sonner";
+import { z } from "zod";
 
 type LoginFormProps = {
-  onSubmit?: React.FormEventHandler<HTMLFormElement>;
+  onSubmit?: (email: string, password: string) => void;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "onSubmit">;
+
+// 🔐 Esquema de validação com Zod
+const loginSchema = z.object({
+  email: z.string().email("E-mail inválido"),
+  password: z
+    .string()
+    .min(6, "A senha deve ter no mínimo 6 caracteres"),
+});
 
 export function LoginForm({ onSubmit, className, ...props }: LoginFormProps) {
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const result = loginSchema.safeParse({ email, password });
+
+    if (!result.success) {
+      const errorMessages = result.error.issues.map((issue) => issue.message);
+      toast.error(errorMessages[0]); // mostra só o primeiro erro
+      return;
+    }
+
+    onSubmit?.(email, password);
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8" onSubmit={onSubmit}>
+          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Bem-vindo de volta</h1>
@@ -43,6 +69,8 @@ export function LoginForm({ onSubmit, className, ...props }: LoginFormProps) {
                   id="email"
                   type="email"
                   placeholder="seuemail@exemplo.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -57,7 +85,13 @@ export function LoginForm({ onSubmit, className, ...props }: LoginFormProps) {
                     Esqueceu sua senha?
                   </button>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
               </div>
               <Button type="submit" className="w-full">
                 Entrar
@@ -79,13 +113,13 @@ export function LoginForm({ onSubmit, className, ...props }: LoginFormProps) {
           </div>
         </CardContent>
       </Card>
+
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
         Ao clicar em continuar, você concorda com nossos{" "}
         <a href="#">Termos de Serviço</a> e{" "}
         <a href="#">Política de Privacidade</a>.
       </div>
 
-      {/* Modal para recuperação de senha */}
       <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
