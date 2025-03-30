@@ -8,69 +8,81 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-
 export default function Quadra() {
+  const { courts, loading } = useQuadrasData();
+  const router = useRouter();
 
-    const { courts, loading } = useQuadrasData();
+  const handleClick = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Você precisa estar logado para acessar essa página", {
+        duration: 6000,
+      });
+    }
+    router.push("dashboard");
+  };
 
-    const router = useRouter();
-    const handleClick = () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            toast.error("Você precisa estar logado para acessar essa página", { duration: 6000 })
-        }
-        router.push('dashboard');
-    };
+  return (
+    <main className="relative flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-300 via-sky-500 to-cyan-200 opacity-20 -z-10" />
+      <div className="w-full max-w-5xl space-y-10">
+        <section className="space-y-6 text-center">
+          <h1 className="text-4xl font-bold text-foreground">
+            Agende sua quadra com facilidade!
+          </h1>
+          <p className="text-muted-foreground text-base max-w-2xl mx-auto">
+            Conheça nossa plataforma de agendamento e facilite o acesso às
+            quadras esportivas da sua cidade.
+          </p>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+            <div className="flex-1">
+              <Image
+                src="/quadra.png"
+                width={600}
+                height={400}
+                alt="Quadra esportiva"
+                className=" object-cover w-full h-auto"
+                priority
+              />
+            </div>
+            <Card className="p-6 flex-1 max-w-md text-center bg-primary/95 shadow-lg">
+              <p className="text-primary-foreground text-base">
+                Esse é o novo jeito de realizar agendamentos para o uso das
+                quadras esportivas. Prático, rápido e fácil!
+              </p>
+            </Card>
+          </div>
+        </section>
 
-    return (
-        <main className="p-6 space-y-8 ">
-            <section className="space-y-4">
-                <h1 className="text-4xl font-bold">
-                    Conheça nosso agendamento de quadra!
-                </h1>
-                <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-center justify-center ">
-                    <div className="w-full md:w-1/2 flex-shrink-0">
-                        <Image
-                        src='/quadra.png'
-                        width={768}
-                        height={500}
-                        alt="Imagem de um campo"
-                        className="object-cover shadow-md w-full h-auto md:w-1/2 md:max-h-80"
-                        priority/>
-                    </div>
-                    <Card className="flex items-center justify-center p-6 md:w-1/2 lg:w-3/5 max-w-2xs">
-                        <p className="text-center text-base md:text-lg">
-                            Esse é o novo jeito de ser feito o agendamento para o uso das quadras esportivas!
-                        </p>
-                    </Card>
-                </div>
-                <Separator className="my-6" />
-            </section>
-            <section className="space-y-4">
-                <h1 className="text-2xl font-bold">Pronto para jogar?</h1>
-                <p className="text-muted-foreground">Confira as quadras disponiveis e reserve agora!</p>
-                
-                <div className="min-h-52 flex flex-wrap p-4 items-center justify-center">
-                    {loading ?(
-                        <div className="flex flex-col items-center gap-2">
-                            <p className="p-4 text-muted-foreground">Carregando quadras...</p>
-                        </div>
+        <Separator className="my-4 border-primary" />
 
-                    ): !courts || courts.length === 0 ?(
-                        <p className="p-4 text-muted-foreground">Não há quadras disponíveis no momento.</p>
-                    ) : ( 
-                        <div className="flex flex-wrap justify-center gap-6 md:gap-8 w-full">
-                            {courts.map((court) => (
-                                <CourtCard
-                                key={court.id}
-                                court={court}
-                                onReserveClick={() =>handleClick()}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </section>
-        </main>
-    );
+        <section className="space-y-6 text-center">
+          <h2 className="text-2xl font-semibold text-foreground">
+            Pronto para jogar?
+          </h2>
+          <p className="text-muted-foreground">
+            Confira as quadras disponíveis e reserve agora mesmo!
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-6 mt-6">
+            {loading ? (
+              <p className="text-muted-foreground">Carregando quadras...</p>
+            ) : !courts || courts.length === 0 ? (
+              <p className="text-muted-foreground">
+                Nenhuma quadra disponível no momento.
+              </p>
+            ) : (
+              courts.map((court) => (
+                <CourtCard
+                  key={court.id}
+                  court={court}
+                  onReserveClick={() => handleClick()}
+                />
+              ))
+            )}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
 }
