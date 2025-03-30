@@ -1,12 +1,9 @@
-"use client";
-import { useSearchParams } from "next/navigation";
-import { ResetPasswordForm } from "@/components/ResetPasswordForm";
+import { Suspense } from "react";
+import { ResetPasswordWrapper } from "@/components/ResetPasswordWrapper";
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token") || "";
-
   return (
+<<<<<<< HEAD
     <div className="flex justify-center items-center min-h-screen max-w-md mx-auto p-4">
       <div>
         <h1 className="text-4xl font-bold mb-4">Redefinir Senha</h1>
@@ -17,5 +14,10 @@ export default function ResetPasswordPage() {
         )}
       </div>
     </div>
+=======
+    <Suspense fallback={<div>Carregando...</div>}>
+      <ResetPasswordWrapper />
+    </Suspense>
+>>>>>>> 24cf77fd17cf02111efa0e8ccd96ef547993298e
   );
 }
