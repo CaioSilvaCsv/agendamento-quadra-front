@@ -68,7 +68,16 @@ export function UserBookings() {
             <p>
               <strong>Horário:</strong> {formatHourUTC(reserva.startTime)} - {formatHourUTC(reserva.endTime)}
             </p>
-            <p><strong>Status:</strong> {reserva.status}</p>
+            <p><strong>Status: </strong> 
+            <span className={
+              reserva.status == "APPROVED" ? "text-green-500":
+              reserva.status == "PENDING" ? "text-orange-500":
+              "" 
+            }>
+            {reserva.status}
+            {reserva.status === "APPROVED" && " ✅" || reserva.status === "PENDING" && " ⏳"}
+            </span>
+             </p>
 
             {reserva.status !== "CANCELLED" && (
               <Button

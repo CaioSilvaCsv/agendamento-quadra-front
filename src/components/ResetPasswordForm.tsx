@@ -41,6 +41,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       <div className="grid gap-2">
         <Label htmlFor="newPassword">Nova Senha</Label>
         <Input
+          className="w-full -mt-1"
           id="newPassword"
           type="password"
           placeholder="Digite sua nova senha"
@@ -49,7 +50,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           required
         />
       </div>
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading} className="w-full items-center mt-2">
         {loading ? "Processando..." : "Redefinir Senha"}
       </Button>
     </form>
