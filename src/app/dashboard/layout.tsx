@@ -1,5 +1,9 @@
 import { Header } from "@/components/header/header";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
 
 export default function RootLayout({
   children,
