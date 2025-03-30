@@ -1,4 +1,5 @@
 "use client";
+
 import { useIsMobile } from "@/hooks/use-mobile";
 import { NavItemInterface } from "@/hooks/use-navItems";
 import Image from "next/image";
@@ -8,16 +9,17 @@ import { useEffect, useState } from "react";
 import NavItem from "./header/nav-item";
 import * as Popover from "@radix-ui/react-popover";
 import { Cross2Icon, HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { useAuth } from "@/context/auth";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 export default function Navbar() {
   const items: NavItemInterface[] = [
-    { url: "/quadras", label: "Inicio" },
+    { url: "/quadras", label: "Início" },
     { url: "/dashboard", label: "Painel" },
     { url: "/login", label: "Login" },
   ];
 
-  const { logout } = useAuth();
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -27,63 +29,63 @@ export default function Navbar() {
       setIsMobileMenuOpen(false);
     }
   }, [isMobile]);
+
   return (
-    <header className="shadow-lg bg-background">
+    <header className="shadow-lg bg-primary">
       <nav
         className="px-4 py-2 flex items-center justify-between max-w-
             screen-xl mx-auto border-b border-solid"
       >
         <Link href="/quadras" className="flex items-center gap-2">
           <Image
-            src="icon.svg"
-            width={50}
-            height={50}
-            alt="Logo do andamento de quadras"
-            className="w-12 h-12 object-cover"
+            src="/icon.svg"
+            width={40}
+            height={40}
+            alt="Logo do QuadraFácil"
+            className="w-10 h-10 object-cover"
           />
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-foreground">QuadraFácil</h1>
-        </div>
+          <span className="text-xl font-semibold text-primary-foreground hidden md:inline-block">
+            QuadraFácil
+          </span>
         </Link>
 
-        {/* Desktop Navigation*/}
-        <ul className="hidden md:flex gap-8 items-center list-none">
-          {items.map((item, index) => (
+        {/* Desktop nav */}
+        <ul className="hidden md:flex items-center gap-6">
+          {items.map((item, i) => (
             <NavItem
-              key={index}
+              key={i}
               url={item.url}
               label={item.label}
               isActive={pathname === item.url}
             />
           ))}
+          <Separator orientation="vertical" className="h-6" />
         </ul>
 
-        {/* Mobile Navigation*/}
+        {/* Mobile nav toggle */}
         {isMobile && (
           <Popover.Root
             open={isMobileMenuOpen}
             onOpenChange={setIsMobileMenuOpen}
           >
             <Popover.Trigger asChild>
-              <button aria-label="Toggle-menu">
-                {isMobileMenuOpen ? (
-                  <Cross2Icon className="w-6 h-6" />
-                ) : (
-                  <HamburgerMenuIcon className=" w-6 h-6" />
-                )}
-              </button>
+              <Button variant="ghost" size="icon" aria-label="Menu">
+                {isMobileMenuOpen ? <Cross2Icon /> : <HamburgerMenuIcon />}
+              </Button>
             </Popover.Trigger>
-
             <Popover.Portal>
               <Popover.Content
-                sideOffset={5}
+                sideOffset={8}
                 align="end"
-                className="rounded-md shadow-md mt-2"
+                className={cn(
+                  "z-50 w-[200px] rounded-md border bg-popover p-4 shadow-md",
+                  "flex flex-col gap-4"
+                )}
               >
-                <ul className="flex flex-col gap-4">
-                  {items.map((item, index) => (
+                <ul className="space-y-2">
+                  {items.map((item, i) => (
                     <NavItem
-                      key={index}
+                      key={i}
                       url={item.url}
                       label={item.label}
                       isActive={pathname === item.url}
@@ -91,12 +93,7 @@ export default function Navbar() {
                     />
                   ))}
                 </ul>
-        <button
-          onClick={logout}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-        >
-          Sair
-        </button>
+                <Separator />
               </Popover.Content>
             </Popover.Portal>
           </Popover.Root>
