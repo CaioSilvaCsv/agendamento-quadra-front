@@ -30,8 +30,12 @@ interface Booking {
   date: string;
   startTime: string;
   endTime: string;
-  status: string; // "PENDING", "APPROVED" ou "REJECTED"
+  status: string;
   reason?: string;
+  user: {
+    name: string;
+    email: string;
+  };
 }
 
 interface Court {
@@ -46,8 +50,12 @@ interface CourtBookingsApprovalProps {
 function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<Record<number, string>>({});
-  const [rejectReasons, setRejectReasons] = useState<Record<number, string>>({});
+  const [selectedStatus, setSelectedStatus] = useState<Record<number, string>>(
+    {}
+  );
+  const [rejectReasons, setRejectReasons] = useState<Record<number, string>>(
+    {}
+  );
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -59,7 +67,9 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
         );
         setBookings(pendingBookings);
       } catch (error) {
-        toast.error(`Erro ao carregar agendamentos pendentes para a quadra ${court.name}`);
+        toast.error(
+          `Erro ao carregar agendamentos pendentes para a quadra ${court.name}`
+        );
       } finally {
         setLoading(false);
       }
@@ -99,9 +109,13 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
 
   return (
     <div className="space-y-4 border rounded-md p-4 mb-4 bg-background">
-      {loading && <p className="text-muted-foreground">Carregando agendamentos...</p>}
+      {loading && (
+        <p className="text-muted-foreground">Carregando agendamentos...</p>
+      )}
       {bookings.length === 0 ? (
-        <p className="text-muted-foreground">Nenhum agendamento pendente para esta quadra.</p>
+        <p className="text-muted-foreground">
+          Nenhum agendamento pendente para esta quadra.
+        </p>
       ) : (
         bookings.map((booking) => (
           <Card
@@ -110,9 +124,15 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
           >
             <CardHeader className="flex items-center">
               <Calendar className="mr-2 h-5 w-5 text-foreground" />
-              <CardTitle className="text-foreground">Agendamento #{booking.id}</CardTitle>
+              <CardTitle className="text-foreground">
+                Agendamento #{booking.id}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
+              <p className="flex items-center text-foreground">
+                <span className="font-semibold mr-1">Solicitante:</span>
+                {booking.user.name} ({booking.user.email})
+              </p>
               <p className="flex items-center text-foreground">
                 <span className="font-semibold mr-1">Data:</span>
                 {format(new Date(booking.date), "dd/MM/yyyy")}
@@ -120,7 +140,8 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
               <p className="flex items-center text-foreground">
                 <Clock className="mr-2 h-5 w-5" />
                 <span className="font-semibold mr-1">Horário:</span>
-                {format(new Date(booking.startTime), "HH:mm")} - {format(new Date(booking.endTime), "HH:mm")}
+                {format(new Date(booking.startTime), "HH:mm")} -{" "}
+                {format(new Date(booking.endTime), "HH:mm")}
               </p>
               <p className="flex items-center text-foreground">
                 <span className="font-semibold mr-1">Status Atual:</span>
@@ -142,7 +163,10 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
               )}
               {selectedStatus[booking.id] === "REJECTED" && (
                 <div className="space-y-2">
-                  <Label htmlFor={`reject-reason-${booking.id}`} className="text-foreground">
+                  <Label
+                    htmlFor={`reject-reason-${booking.id}`}
+                    className="text-foreground"
+                  >
                     Motivo da Rejeição
                   </Label>
                   <Input
@@ -150,7 +174,9 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
                     type="text"
                     placeholder="Informe o motivo..."
                     value={rejectReasons[booking.id] || ""}
-                    onChange={(e) => handleRejectReasonChange(booking.id, e.target.value)}
+                    onChange={(e) =>
+                      handleRejectReasonChange(booking.id, e.target.value)
+                    }
                   />
                 </div>
               )}
@@ -159,18 +185,29 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
               <div className="space-x-2">
                 <Button
                   onClick={() => handleStatusChange(booking.id, "APPROVED")}
-                  variant={selectedStatus[booking.id] === "APPROVED" ? "default" : "outline"}
+                  variant={
+                    selectedStatus[booking.id] === "APPROVED"
+                      ? "default"
+                      : "outline"
+                  }
                 >
                   Aprovar
                 </Button>
                 <Button
                   onClick={() => handleStatusChange(booking.id, "REJECTED")}
-                  variant={selectedStatus[booking.id] === "REJECTED" ? "default" : "outline"}
+                  variant={
+                    selectedStatus[booking.id] === "REJECTED"
+                      ? "default"
+                      : "outline"
+                  }
                 >
                   Rejeitar
                 </Button>
               </div>
-              <Button onClick={() => handleApproval(booking.id)} disabled={loading}>
+              <Button
+                onClick={() => handleApproval(booking.id)}
+                disabled={loading}
+              >
                 Confirmar
               </Button>
             </CardFooter>
@@ -203,10 +240,14 @@ export function BookingApprovalForm() {
   return (
     <div className="space-y-4 bg-background p-4 rounded-md border border-border">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Aprovação de Agendamentos</h2>
+        <h2 className="text-xl font-semibold text-foreground">
+          Aprovação de Agendamentos
+        </h2>
         <Separator className="my-4 border-border" />
       </div>
-      {loading && <p className="text-muted-foreground">Carregando quadras...</p>}
+      {loading && (
+        <p className="text-muted-foreground">Carregando quadras...</p>
+      )}
       <Accordion type="single" collapsible className="w-full">
         {courts.map((court) => (
           <AccordionItem key={court.id} value={`${court.id}`}>
