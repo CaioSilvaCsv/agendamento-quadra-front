@@ -5,6 +5,15 @@ import { useAuth } from "@/context/auth";
 import api from "@/services/api";
 import { useToastHandler } from "@/hooks/use-toast-handler";
 
+/**
+ * 
+ * @returns Componente PaginaDeLogin
+ * @description Componente que renderiza o formulário de login,
+ * sendo responsável por lidar com o login do usuário e direcina para o dashboard quando concluído,
+ * fazer o redirecionamento para a rota novo usuário quando o usuário não possui cadastro, ou
+ * recuperação de senha.
+ */
+
 export default function PaginaDeLogin() {
   const router = useRouter();
   const { login } = useAuth();

@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "Quadras",
 };
 
+/**
+ * Layout para as rotas de quadras
+ * **/
 export default function RootLayout({
   children,
 }: Readonly<{

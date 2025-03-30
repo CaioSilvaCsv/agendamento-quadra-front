@@ -21,7 +21,10 @@ interface Court {
   id: number;
   name: string;
 }
-
+/**
+ *  Componente CreateBlockedTimeForm
+ * @description Formulário para criar um novo horário bloqueado e verificando a partir da data e horário selecionados.
+**/
 export function CreateBlockedTimeForm() {
   const [courts, setCourts] = useState<Court[]>([]);
   const [courtId, setCourtId] = useState("");

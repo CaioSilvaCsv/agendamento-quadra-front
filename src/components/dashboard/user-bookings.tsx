@@ -19,7 +19,12 @@ interface Booking {
     name: string
   }
 }
-
+/**
+ * 
+ * @returns Componente UserBookings
+ * @description Componente que exibe as reservas do usuário mostrando o status e 
+ * ação de cancelamento.
+ */
 export function UserBookings() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
@@ -85,6 +90,8 @@ export function UserBookings() {
                     ? "text-orange-500"
                     : reserva.status === "REJECTED"
                     ? "text-red-500"
+                    : reserva.status === "CANCELLED"
+                    ? "text-red-500"
                     : ""
                 }
               >
@@ -92,6 +99,7 @@ export function UserBookings() {
                 {reserva.status === "APPROVED" && " ✅"}
                 {reserva.status === "PENDING" && " ⏳"}
                 {reserva.status === "REJECTED" && " ❌"}
+                {reserva.status === "CANCELLED" && " ❌"}
               </span>
             </p>
 

@@ -22,6 +22,16 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import React from "react";
 
+/**
+ * 
+ * @returns Componente DashboardPage
+ * @description Componente que renderiza o dashboard do usuário
+ * Caso o usuário seja administrador, ele ganha novos recursos no dashboard.
+ * Recursos de usuário: Criar reservas, ver e cancelar suas reservas.
+ * Recursos de administrador: Criar quadras, criar horários bloqueados, criar reservas, aprovar reservas.
+ * É necessário está logado para acessar essa pagina.
+**/
+
 export default function DashboardPage() {
   const { user, loading } = useUserData();
 
