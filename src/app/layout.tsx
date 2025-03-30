@@ -20,7 +20,8 @@ export const metadata: Metadata = {
   title:{
     template: "%s | QuadraFácil",
     default: "QuadraFácil",
-  }
+  },
+  icons: "/icon.ico",
 
 };
 
