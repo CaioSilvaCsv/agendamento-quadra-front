@@ -8,7 +8,7 @@ import { CreateBookingForm } from "@/components/dashboard/create-bookings-form";
 import { CreateBlockedTimeForm } from "@/components/dashboard/CreateBlockedTimeForm";
 import BlockedTimesManager from "@/components/dashboard/BlockedTimesManager";
 import BookingApprovalForm from "@/components/dashboard/BookingApprovalForm";
-import { CreateCourtForm } from "@/components/dashboard/CreateCourtForm"; // Novo formulário
+import { CreateCourtForm } from "@/components/dashboard/CreateCourtForm";
 import { UserBookings } from "@/components/dashboard/user-bookings";
 import {
   ResizablePanelGroup,
@@ -23,20 +23,20 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function DashboardPage() {
-  // Hooks sempre chamados no início
   const { user, loading } = useUserData();
   const router = useRouter();
 
-  const initialSettings: DashboardSettings = {
+  const initialDesktopSettings: DashboardSettings = {
     showCreateBlockedTimeForm: true,
     showCreateBookingForm: true,
     showBlockedTimesManager: true,
-    showBookingApprovalForm: true,
-    showCreateCourtForm: true, // Nova opção para criação de quadra
+    showBookingApprovalForm: false,
+    showCreateCourtForm: true,
   };
 
-  const [dashboardSettings, setDashboardSettings] =
-    useState<DashboardSettings>(initialSettings);
+  const [dashboardSettings, setDashboardSettings] = useState<DashboardSettings>(
+    initialDesktopSettings
+  );
 
   useEffect(() => {
     const saved = localStorage.getItem("dashboardSettings");
@@ -56,92 +56,100 @@ export default function DashboardPage() {
     );
   }, [dashboardSettings]);
 
-  // Criação dos painéis do administrador com base nas configurações
-  const adminPanels = useMemo(() => {
-    const panels: JSX.Element[] = [];
-
+  // Cria um array com o conteúdo de cada painel (sem os wrappers de ResizablePanel)
+  const adminPanelContents = useMemo(() => {
+    const contents: JSX.Element[] = [];
     if (dashboardSettings.showCreateCourtForm) {
-      panels.push(
-        <ResizablePanel key="createCourt">
-          <ScrollArea className="h-[74vh] p-4">
-            <motion.div
-              initial={{ opacity: 0.5, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <CreateCourtForm />
-            </motion.div>
-          </ScrollArea>
-        </ResizablePanel>
+      contents.push(
+        <div key="createCourt" className="p-4">
+          <CreateCourtForm />
+        </div>
       );
     }
     if (dashboardSettings.showCreateBlockedTimeForm) {
-      panels.push(
-        <ResizablePanel key="createBlockedTime">
-          <ScrollArea className="h-[74vh] p-4">
-            <motion.div
-              initial={{ opacity: 0.5, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <CreateBlockedTimeForm />
-            </motion.div>
-          </ScrollArea>
-        </ResizablePanel>
+      contents.push(
+        <div key="createBlockedTime" className="p-4">
+          <CreateBlockedTimeForm />
+        </div>
       );
     }
     if (dashboardSettings.showCreateBookingForm) {
-      panels.push(
-        <ResizablePanel key="createBooking">
-          <ScrollArea className="h-[74vh] p-4">
-            <motion.div
-              initial={{ opacity: 0.5, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <CreateBookingForm />
-            </motion.div>
-          </ScrollArea>
-        </ResizablePanel>
+      contents.push(
+        <div key="createBooking" className="p-4">
+          <CreateBookingForm />
+        </div>
       );
     }
     if (dashboardSettings.showBlockedTimesManager) {
-      panels.push(
-        <ResizablePanel key="blockedManager">
-          <ScrollArea className="h-[74vh] p-4">
-            <motion.div
-              initial={{ opacity: 0.5, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <BlockedTimesManager />
-            </motion.div>
-          </ScrollArea>
-        </ResizablePanel>
+      contents.push(
+        <div key="blockedManager" className="p-4">
+          <BlockedTimesManager />
+        </div>
       );
     }
     if (dashboardSettings.showBookingApprovalForm) {
-      panels.push(
-        <ResizablePanel key="bookingApproval">
-          <ScrollArea className="h-[74vh] p-4">
-            <motion.div
-              initial={{ opacity: 0.5, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <BookingApprovalForm />
-            </motion.div>
-          </ScrollArea>
-        </ResizablePanel>
+      contents.push(
+        <div key="bookingApproval" className="p-4">
+          <BookingApprovalForm />
+        </div>
       );
     }
-    return panels;
+    return contents;
   }, [dashboardSettings]);
 
-  // Conteúdo para usuários comuns (sempre definido)
+  // Para desktop, envolve os conteúdos em ResizablePanelGroup com ResizablePanel
+  const desktopAdminContent = (
+    <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
+      {adminPanelContents.map((content, index) => (
+        <ResizablePanel key={index}>{content}</ResizablePanel>
+      ))}
+    </ResizablePanelGroup>
+  );
+
+  // Detecta se está em dispositivo mobile
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Para mobile, renderiza somente um painel por vez com botões de navegação
+  const [activePanelIndex, setActivePanelIndex] = useState(0);
+  const mobileAdminContent = (
+    <div className="space-y-4">
+      <div className="flex justify-between">
+        <button
+          className="px-4 py-2 border rounded disabled:opacity-50"
+          onClick={() => setActivePanelIndex((prev) => Math.max(prev - 1, 0))}
+          disabled={activePanelIndex === 0}
+        >
+          Anterior
+        </button>
+        <button
+          className="px-4 py-2 border rounded disabled:opacity-50"
+          onClick={() =>
+            setActivePanelIndex((prev) =>
+              Math.min(prev + 1, adminPanelContents.length - 1)
+            )
+          }
+          disabled={activePanelIndex === adminPanelContents.length - 1}
+        >
+          Próximo
+        </button>
+      </div>
+      <div className="rounded-lg border">
+        <ScrollArea className="h-[74vh]">
+          {adminPanelContents[activePanelIndex]}
+        </ScrollArea>
+      </div>
+    </div>
+  );
+
+  // Conteúdo para usuários comuns permanece o mesmo
   const userContent = (
     <div className="relative">
-      <div className="absolute rounded-lg" />
       <ResizablePanelGroup
         direction="horizontal"
         className="rounded-2xl border"
@@ -152,7 +160,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="rounded-xl p-4 "
+              className="rounded-xl p-4"
             >
               <CreateBookingForm />
             </motion.div>
@@ -165,7 +173,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="rounded-xl p-4 "
+              className="rounded-xl p-4"
             >
               <UserBookings />
             </motion.div>
@@ -174,25 +182,6 @@ export default function DashboardPage() {
       </ResizablePanelGroup>
     </div>
   );
-
-  // Renderiza os painéis do administrador com handles entre eles
-  const adminContent =
-    adminPanels.length > 0 ? (
-      <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
-        {adminPanels.reduce((acc, panel, index) => {
-          if (index === 0) return [panel];
-          return [
-            ...acc,
-            <ResizableHandle key={`handle-${index}`} withHandle />,
-            panel,
-          ];
-        }, [] as JSX.Element[])}
-      </ResizablePanelGroup>
-    ) : (
-      <p className="p-4 text-muted-foreground text-center mt-4">
-        Nenhum serviço selecionado para exibição.
-      </p>
-    );
 
   if (loading) {
     return (
@@ -238,7 +227,7 @@ export default function DashboardPage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              {adminContent}
+              {isMobile ? mobileAdminContent : desktopAdminContent}
             </motion.div>
           ) : (
             <motion.div
