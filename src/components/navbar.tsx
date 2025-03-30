@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import NavItem from "./header/nav-item";
 import * as Popover from "@radix-ui/react-popover";
 import { Cross2Icon, HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { useAuth } from "@/context/auth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
