@@ -21,7 +21,6 @@ export default function Navbar() {
     { url: "/login", label: "Login" },
   ];
 
-  const { logout } = useAuth();
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,7 +32,7 @@ export default function Navbar() {
   }, [isMobile]);
 
   return (
-    <header className="shadow-lg bg-background">
+    <header className="shadow-lg bg-primary">
       <nav
         className="px-4 py-2 flex items-center justify-between max-w-
             screen-xl mx-auto border-b border-solid"
