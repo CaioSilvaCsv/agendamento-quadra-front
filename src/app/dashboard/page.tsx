@@ -201,7 +201,7 @@ export default function DashboardPage() {
           transition={{ duration: 0.4 }}
           className="text-2xl font-bold"
         >
-          Bem-vindo, {user.name}!
+          Bem-vindo(a), {user.name}!
         </motion.h1>
         {user.role === "ADMIN" && (
           <motion.div
