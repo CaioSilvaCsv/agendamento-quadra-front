@@ -14,7 +14,9 @@ import {
 import { toast } from "sonner";
 import api from "@/services/api";
 import axios from "axios";
-import { format, isSameDay, setHours, setMinutes, addHours } from "date-fns";
+import { format, addHours } from "date-fns";
+import { parseISO } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { Separator } from "../ui/separator";
 import { Calendar, Clock, MapPin } from "lucide-react";
 import { useBookingUpdate } from "@/context/BookingUpdateContext";
@@ -57,25 +59,26 @@ export function CreateBookingForm() {
   const [blockedTimes, setBlockedTimes] = useState<BookingBlock[]>([]);
 
   const selectedCourt = courts.find((court) => String(court.id) === courtId);
-  const dateObj = date ? new Date(date) : null;
+  // Forçamos a criação do objeto de data a partir do input adicionando "T00:00:00"
+  const dateObj = date ? new Date(date + "T00:00:00") : null;
 
+  // Filtra as reservas comparando apenas a parte da data (yyyy-MM-dd)
   const filteredBookings = useMemo(() => {
-    return courtBookings.filter(
-      (b) => dateObj && isSameDay(new Date(b.date), dateObj)
-    );
-  }, [courtBookings, dateObj]);
+    return courtBookings.filter((b) => date && b.date?.substring(0, 10) === date);
+  }, [courtBookings, date]);
 
+  // Filtra os bloqueios, considerando reservas específicas ou recorrentes
   const filteredBlocks = useMemo(() => {
     return blockedTimes.filter((b) => {
-      const blockDate = b.date ? new Date(b.date) : null;
-      const sameDay = blockDate && dateObj && isSameDay(blockDate, dateObj);
+      const blockDate = b.date ? b.date.substring(0, 10) : null;
+      const sameDay = blockDate === date;
       const sameWeekday =
         b.recurringDay !== undefined &&
-        dateObj &&
-        b.recurringDay === dateObj.getDay();
+        date &&
+        new Date(date + "T00:00:00").getDay() === b.recurringDay;
       return sameDay || sameWeekday;
     });
-  }, [blockedTimes, dateObj]);
+  }, [blockedTimes, date]);
 
   const generateTimeSlots = (): TimeSlot[] => {
     if (!selectedCourt || !dateObj) return [];
@@ -83,8 +86,11 @@ export function CreateBookingForm() {
     const [openH, openM] = selectedCourt.openTime.split(":").map(Number);
     const [closeH, closeM] = selectedCourt.closeTime.split(":").map(Number);
 
-    const start = setMinutes(setHours(new Date(dateObj), openH), openM);
-    const end = setMinutes(setHours(new Date(dateObj), closeH), closeM);
+    // Define os horários de abertura e fechamento considerando a data escolhida
+    const start = new Date(dateObj);
+    start.setHours(openH, openM, 0, 0);
+    const end = new Date(dateObj);
+    end.setHours(closeH, closeM, 0, 0);
 
     const slots: TimeSlot[] = [];
     let current = new Date(start);
@@ -93,31 +99,31 @@ export function CreateBookingForm() {
       const slotStart = new Date(current);
       const slotEnd = addHours(slotStart, 1);
 
+      // Verifica se há bloqueio: compara o slot com o horário bloqueado (usando split para obter a data)
       const isBlocked = filteredBlocks.some((b) => {
         if (!b.startTime || !b.endTime) {
           return true;
         }
-        const blockDate = b.date
-          ? b.date.split("T")[0]
-          : format(dateObj, "yyyy-MM-dd");
+        const blockDate = b.date ? b.date.split("T")[0] : date;
         const blockStart = new Date(`${blockDate}T${b.startTime}`);
         const blockEnd = new Date(`${blockDate}T${b.endTime}`);
         return slotStart >= blockStart && slotStart < blockEnd;
       });
 
+      // Verifica se há reserva (apenas PENDING ou APPROVED)
       const isReserved = filteredBookings.some((b) => {
         if (b.status !== "PENDING" && b.status !== "APPROVED") return false;
         return (
-          slotStart < new Date(b.endTime) && slotEnd > new Date(b.startTime)
+          slotStart < new Date(`${date}T${b.endTime}`) &&
+          slotEnd > new Date(`${date}T${b.startTime}`)
         );
       });
 
-      // Prioriza a reserva: se houver uma reserva, o slot será "reserved", senão, se houver bloqueio, será "blocked".
       const slotStatus: TimeSlot["status"] = isReserved
         ? "reserved"
         : isBlocked
-          ? "blocked"
-          : "available";
+        ? "blocked"
+        : "available";
 
       slots.push({
         start: format(slotStart, "HH:mm"),
@@ -178,12 +184,27 @@ export function CreateBookingForm() {
     e.preventDefault();
     setLoading(true);
     try {
+      const [year, month, day] = date.split("-");
+      const [startH, startM] = startTime.split(":").map(Number);
+      const [endH, endM] = endTime.split(":").map(Number);
+
+      // Cria as datas usando os valores do input sem conversão indesejada
+      const startDate = new Date(Number(year), Number(month) - 1, Number(day), startH, startM);
+      const endDate = new Date(Number(year), Number(month) - 1, Number(day), endH, endM);
+
+      if (startDate >= endDate) {
+        toast.error("O horário de término deve ser depois do horário de início");
+        setLoading(false);
+        return;
+      }
+
       await api.post("/bookings", {
         courtId: Number(courtId),
-        date,
-        startTime,
-        endTime,
+        date, // Envia a data exatamente como selecionada (ex: "2025-03-31")
+        startTime: format(startDate, "HH:mm"),
+        endTime: format(endDate, "HH:mm"),
       });
+
       toast.success("Reserva criada com sucesso!", { duration: 4000 });
       triggerUpdate();
       setCourtId("");
@@ -210,10 +231,7 @@ export function CreateBookingForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 bg-background p-4 rounded-md border border-border"
-    >
+    <form onSubmit={handleSubmit} className="space-y-4 bg-background p-4 rounded-md border border-border">
       <div>
         <h2 className="text-xl font-semibold text-foreground">Nova Reserva</h2>
         <Separator className="my-4 border-border" />
@@ -230,11 +248,7 @@ export function CreateBookingForm() {
           </SelectTrigger>
           <SelectContent className="bg-background border-border">
             {courts.map((court) => (
-              <SelectItem
-                key={court.id}
-                value={String(court.id)}
-                className="text-foreground"
-              >
+              <SelectItem key={court.id} value={String(court.id)} className="text-foreground">
                 {court.name}
               </SelectItem>
             ))}
@@ -246,19 +260,16 @@ export function CreateBookingForm() {
         <div className="bg-muted p-3 rounded-md text-sm text-muted-foreground">
           <p className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
-            <span className="font-semibold">Local:</span>{" "}
-            {selectedCourt.location}
+            <span className="font-semibold">Local:</span> {selectedCourt.location}
           </p>
           <p className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
-            <span className="font-semibold">Horário:</span>{" "}
-            {selectedCourt.openTime} - {selectedCourt.closeTime}
+            <span className="font-semibold">Horário:</span> {selectedCourt.openTime} - {selectedCourt.closeTime}
           </p>
           {selectedCourt.description && (
             <p className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              <span className="font-semibold">Descrição:</span>{" "}
-              {selectedCourt.description}
+              <span className="font-semibold">Descrição:</span> {selectedCourt.description}
             </p>
           )}
         </div>
@@ -307,13 +318,30 @@ export function CreateBookingForm() {
               <Clock className="h-4 w-4 text-foreground" />
               <p className="font-semibold">Horários indisponíveis:</p>
             </div>
+            {date && filteredBookings.length > 0 && (
+              <div className="bg-white rounded-md border p-3 mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar className="h-4 w-4 text-foreground" />
+                  <p className="font-semibold">Reservas no dia:</p>
+                </div>
+                <ul className="list-disc list-inside text-sm">
+                  {filteredBookings.map((booking, index) => (
+                    <li key={index}>
+                      {formatInTimeZone(parseISO(booking.startTime), "UTC", "HH:mm")} -{" "}
+                      {formatInTimeZone(parseISO(booking.endTime), "UTC", "HH:mm")}{" "}
+                      {booking.status === "APPROVED" && "(Aprovada)"}
+                      {booking.status === "PENDING" && "(Pendente)"}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <ul className="list-disc list-inside text-sm">
               {slots
                 .filter((s) => s.status !== "available")
                 .map((s, i) => (
                   <li key={i}>
-                    {s.start} - {s.end} (
-                    {s.status === "reserved" ? "Reservado" : "Bloqueado"})
+                    {s.start} - {s.end} ({s.status === "reserved" ? "Reservado" : "Bloqueado"})
                   </li>
                 ))}
             </ul>

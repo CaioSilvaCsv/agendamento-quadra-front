@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { parseISO } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
+
 import api from "@/services/api";
 import { Separator } from "../ui/separator";
 import {
@@ -32,10 +34,7 @@ interface Booking {
   endTime: string;
   status: string;
   reason?: string;
-  user: {
-    name: string;
-    email: string;
-  };
+  user: { name: string; email: string };
 }
 
 interface Court {
@@ -47,15 +46,31 @@ interface CourtBookingsApprovalProps {
   court: Court;
 }
 
+function formatBookingDate(dateStr: string | null) {
+  try {
+    if (!dateStr) return "Data inválida";
+    const utcDate = parseISO(dateStr);
+    return formatInTimeZone(utcDate, "UTC", "dd/MM/yyyy");
+  } catch {
+    return "Data inválida";
+  }
+}
+
+function formatBookingTime(dateTimeStr: string | null) {
+  try {
+    if (!dateTimeStr) return "--:--";
+    const utcTime = parseISO(dateTimeStr);
+    return formatInTimeZone(utcTime, "UTC", "HH:mm");
+  } catch {
+    return "--:--";
+  }
+}
+
 function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<Record<number, string>>(
-    {}
-  );
-  const [rejectReasons, setRejectReasons] = useState<Record<number, string>>(
-    {}
-  );
+  const [selectedStatus, setSelectedStatus] = useState<Record<number, string>>({});
+  const [rejectReasons, setRejectReasons] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -67,9 +82,7 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
         );
         setBookings(pendingBookings);
       } catch (error) {
-        toast.error(
-          `Erro ao carregar agendamentos pendentes para a quadra ${court.name}`
-        );
+        toast.error(`Erro ao carregar agendamentos pendentes para a quadra ${court.name}`);
       } finally {
         setLoading(false);
       }
@@ -130,26 +143,26 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
             </CardHeader>
             <CardContent className="space-y-2">
               <p className="flex items-center text-foreground">
-                <span className="font-semibold mr-1">Solicitante:</span>
+                <span className="font-semibold mr-1">Solicitante:</span>{" "}
                 {booking.user.name} ({booking.user.email})
               </p>
               <p className="flex items-center text-foreground">
-                <span className="font-semibold mr-1">Data:</span>
-                {format(new Date(booking.date), "dd/MM/yyyy")}
+                <span className="font-semibold mr-1">Data:</span>{" "}
+                {formatBookingDate(booking.date)}
               </p>
               <p className="flex items-center text-foreground">
                 <Clock className="mr-2 h-5 w-5" />
-                <span className="font-semibold mr-1">Horário:</span>
-                {format(new Date(booking.startTime), "HH:mm")} -{" "}
-                {format(new Date(booking.endTime), "HH:mm")}
+                <span className="font-semibold mr-1">Horário:</span>{" "}
+                {formatBookingTime(booking.startTime)} -{" "}
+                {formatBookingTime(booking.endTime)}
               </p>
               <p className="flex items-center text-foreground">
-                <span className="font-semibold mr-1">Status Atual:</span>
+                <span className="font-semibold mr-1">Status Atual:</span>{" "}
                 {booking.status}
               </p>
               {selectedStatus[booking.id] && (
                 <p className="flex items-center text-foreground">
-                  <span className="font-semibold mr-1">Nova Ação:</span>
+                  <span className="font-semibold mr-1">Nova Ação:</span>{" "}
                   {selectedStatus[booking.id] === "APPROVED" ? (
                     <span className="flex items-center">
                       <Check className="mr-1 h-4 w-4" /> Aprovar
@@ -184,7 +197,9 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
             <CardFooter className="flex justify-end space-x-4">
               <div className="space-x-2">
                 <Button
-                  onClick={() => handleStatusChange(booking.id, "APPROVED")}
+                  onClick={() =>
+                    handleStatusChange(booking.id, "APPROVED")
+                  }
                   variant={
                     selectedStatus[booking.id] === "APPROVED"
                       ? "default"
@@ -194,7 +209,9 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
                   Aprovar
                 </Button>
                 <Button
-                  onClick={() => handleStatusChange(booking.id, "REJECTED")}
+                  onClick={() =>
+                    handleStatusChange(booking.id, "REJECTED")
+                  }
                   variant={
                     selectedStatus[booking.id] === "REJECTED"
                       ? "default"
@@ -204,10 +221,7 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
                   Rejeitar
                 </Button>
               </div>
-              <Button
-                onClick={() => handleApproval(booking.id)}
-                disabled={loading}
-              >
+              <Button onClick={() => handleApproval(booking.id)} disabled={loading}>
                 Confirmar
               </Button>
             </CardFooter>
