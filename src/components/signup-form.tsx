@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import Image from "next/image";
 
 
 type SignupFormProps = {
@@ -26,7 +27,7 @@ export function SignupForm({
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Crie sua conta</h1>
                 <p className="text-balance text-muted-foreground">
-                  Cadastre-se na Acme Inc
+                Faça parte da QuadraFácil
                 </p>
               </div>
               <div className="grid gap-2">
@@ -66,11 +67,11 @@ export function SignupForm({
               </div>
             </div>
           </form>
-          <div className="relative hidden bg-muted md:block">
+          <div className="relative hidden md:block mr-6">
             <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              src="/image-base.png"
+              alt="Imagem ilustrativa"
+              className="absolute inset-0 h-full w-full rounded-2xl object-cover"
             />
           </div>
         </CardContent>
