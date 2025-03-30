@@ -47,6 +47,12 @@ interface TimeSlot {
   status: "available" | "reserved" | "blocked";
 }
 
+/**
+ * @returns Componente CreateBookingForm
+ * @description Formulário para criar uma nova reserva de quadra e verificando 
+ * suas pendencias e bloqueios para limitar.
+ */
+
 export function CreateBookingForm() {
   const { triggerUpdate } = useBookingUpdate();
   const [courts, setCourts] = useState<Court[]>([]);

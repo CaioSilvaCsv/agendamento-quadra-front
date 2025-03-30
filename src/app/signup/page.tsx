@@ -5,6 +5,12 @@ import { SignupForm } from "@/components/signup-form"
 import api from "@/services/api"
 import { useToastHandler } from "@/hooks/use-toast-handler"
 
+/**
+ * @param data - Dados do usuário a serem cadastrados
+ * @returns Componente SignupPage
+ * @description Componente que renderiza o formulário de cadastro de usuário
+ **/
+
 export default function SignupPage() {
   const router = useRouter()
   const { showError, showSuccess } = useToastHandler()

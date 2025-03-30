@@ -7,7 +7,11 @@ import { useQuadrasData } from "@/hooks/use-quadra";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-
+/**
+ * @returns pagina de Quadra
+ * @description Componente que renderiza a página de quadras, e lista todas as quadras disponíveis para agendamento.
+ * Não é necessário está logado para acessar essa pagina.
+**/
 export default function Quadra() {
   const { courts, loading } = useQuadrasData();
   const router = useRouter();

@@ -66,6 +66,14 @@ function formatBookingTime(dateTimeStr: string | null) {
   }
 }
 
+/**
+ * 
+ * @param {CourtBookingsApprovalProps} props - Propriedades do componente
+ * @returns Componente de agendamentos de ser aprovados
+ * @description Componente para exibir os agendamentos de uma quadra específica para ser 
+ * aceitos ou não o agendamento.
+ */
+
 function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
@@ -231,6 +239,10 @@ function CourtBookingsApproval({ court }: CourtBookingsApprovalProps) {
     </div>
   );
 }
+
+/**
+ * Componente para exibir o formulário de aprovação de agendamentos
+**/
 
 export function BookingApprovalForm() {
   const [courts, setCourts] = useState<Court[]>([]);

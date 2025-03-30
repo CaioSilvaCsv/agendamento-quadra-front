@@ -44,6 +44,15 @@ interface BlockedTime {
   reason: string;
 }
 
+/**
+ * Componente 
+ * @returns Componente BlockedTimesManager
+ * @param {Object} props - Propriedades do componente
+ * @param {Array} props.blockedTimes - Lista de horários bloqueados
+ * @description Este componente gerencia os horários bloqueados.
+ * 
+ */
+
 export function BlockedTimesManager() {
   const [courts, setCourts] = useState<Court[]>([]);
   const [courtId, setCourtId] = useState("");

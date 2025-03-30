@@ -22,6 +22,12 @@ const textVariants = {
   hover: { opacity: 1, y: 0 },
 };
 
+/**
+ * @param settings - Configurações do dashboard
+ * @description Componente que exibe os ícones de configurações do dashboard para a adição de
+ * quadras, reservas, bloqueios e aprovação de reservas.
+  **/
+
 export function DashboardSettingsIcons({
   settings,
   onChange,

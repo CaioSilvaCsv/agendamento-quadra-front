@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Define o título padrão da página
 export const metadata: Metadata = {
   title:{
     template: "%s | QuadraFácil",
