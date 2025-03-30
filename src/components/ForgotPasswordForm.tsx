@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "../ui/separator";
 import { toast } from "sonner";
 import api from "@/services/api";
 
@@ -20,7 +19,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps) {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await api.post("/auth/forgot-password", { email });
+      const { data } = await api.post<{ message: string }>("/auth/forgot-password", { email });
       toast.success(data.message, { duration: 4000 });
       // Fecha o modal automaticamente após sucesso
       if (onSuccess) {
@@ -35,7 +34,6 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps) {
       setLoading(false);
     }
   };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4">
       <div className="grid gap-2">
