@@ -33,9 +33,12 @@ export default function Navbar() {
   }, [isMobile]);
 
   return (
-    <header className="sticky top-0 z-50 w-full  bg-primary border-b">
-      <nav className="flex items-center justify-between px-4 py-3 max-w-screen-xl mx-auto">
-        <Link href="/" className="flex items-center gap-2">
+    <header className="shadow-lg bg-background">
+      <nav
+        className="px-4 py-2 flex items-center justify-between max-w-
+            screen-xl mx-auto border-b border-solid"
+      >
+        <Link href="/quadras" className="flex items-center gap-2">
           <Image
             src="/icon.svg"
             width={40}
