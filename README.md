@@ -24,6 +24,7 @@ QuadraFácil é uma plataforma para agendamento de quadras esportivas. O projeto
 *   **Next.js & React:** Estrutura e renderização das páginas e componentes.
 *   **Tailwind CSS:** Estilização e design responsivo.
 *   **Framer Motion:** Animações e transições suaves, especialmente nos dashboards e toggles.
+*   **ShadCN/UI:** Componentes acessíveis e estilizados, garantindo consistência na interface.
 *   **Zod:** Validação de formulários, garantindo dados corretos e consistentes.
 *   **Axios:** Comunicação com a API backend para operações de autenticação, reservas, quadras, bloqueios e aprovações.
 *   **Context API & Hooks Customizados:** Gerenciamento de estado global para autenticação (AuthProvider) e atualização de reservas (BookingUpdateProvider). Hooks como `useUserData` e `useQuadrasData` facilitam o consumo de dados.
